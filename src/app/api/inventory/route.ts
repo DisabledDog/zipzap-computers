@@ -49,8 +49,8 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json()
 
-    // Validate required fields
-    const requiredFields = ['title', 'description', 'price', 'category', 'condition', 'brand']
+    // Validate required fields (description is now optional)
+    const requiredFields = ['title', 'category', 'condition', 'brand']
     for (const field of requiredFields) {
       if (!body[field]) {
         return NextResponse.json(
@@ -58,6 +58,14 @@ export async function POST(request: NextRequest) {
           { status: 400 }
         )
       }
+    }
+
+    // Special validation for price (can be 0, but must be a number)
+    if (body.price === undefined || body.price === null || typeof body.price !== 'number') {
+      return NextResponse.json(
+        { success: false, error: `Missing or invalid required field: price` },
+        { status: 400 }
+      )
     }
 
     // Transform data to match database schema

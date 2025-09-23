@@ -18,8 +18,11 @@ export async function GET() {
     const data = await response.json()
 
     if (data.status === 'OK' && data.result.reviews) {
-      // Return the first 6 reviews
-      const reviews = data.result.reviews.slice(0, 6).map((review: any) => ({
+      // Filter for 5-star reviews only and return up to 6
+      const reviews = data.result.reviews
+        .filter((review: any) => review.rating === 5)
+        .slice(0, 6)
+        .map((review: any) => ({
         author_name: review.author_name,
         rating: review.rating,
         text: review.text,

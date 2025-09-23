@@ -66,6 +66,27 @@ export default function CustomGoogleWidget() {
         text: "Had my phone screen replaced here. Quick service, fair prices, and they stand behind their work. Will definitely come back for future repairs.",
         time: Date.now() / 1000 - 86400 * 20,
         relative_time_description: "3 weeks ago"
+      },
+      {
+        author_name: "Lisa T.",
+        rating: 5,
+        text: "Outstanding service! Fixed my gaming console quickly and at a great price. The technicians are knowledgeable and friendly. Highly recommend!",
+        time: Date.now() / 1000 - 86400 * 25,
+        relative_time_description: "3 weeks ago"
+      },
+      {
+        author_name: "David P.",
+        rating: 5,
+        text: "Brought my tablet here for a cracked screen repair. They had it done the same day and it looks brand new. Excellent work and customer service!",
+        time: Date.now() / 1000 - 86400 * 30,
+        relative_time_description: "1 month ago"
+      },
+      {
+        author_name: "Jennifer S.",
+        rating: 5,
+        text: "Best computer repair shop in town! They diagnosed and fixed my laptop's overheating issue quickly. Fair pricing and great warranty too!",
+        time: Date.now() / 1000 - 86400 * 35,
+        relative_time_description: "1 month ago"
       }
     ]
 

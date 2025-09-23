@@ -5,54 +5,58 @@ import { Search, Filter, Package, Star, Clock, ShoppingCart } from 'lucide-react
 import { InventoryItem, defaultInventory, inventoryCategories, InventoryCategory } from '@/data/inventory'
 
 export default function StorePage() {
-  const [inventory, setInventory] = useState<InventoryItem[]>(defaultInventory)
-  const [filteredInventory, setFilteredInventory] = useState<InventoryItem[]>(defaultInventory)
+  const [inventory, setInventory] = useState<InventoryItem[]>([])
+  const [filteredInventory, setFilteredInventory] = useState<InventoryItem[]>([])
   const [selectedCategory, setSelectedCategory] = useState<string>('All')
   const [searchTerm, setSearchTerm] = useState('')
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     // Load inventory from database (modern approach)
-    loadInventoryFromDatabase()
-  }, [])
+    const loadData = async () => {
+      try {
+        const response = await fetch('/api/inventory')
+        const result = await response.json()
 
-  const loadInventoryFromDatabase = async () => {
-    try {
-      const response = await fetch('/api/inventory')
-      const result = await response.json()
+        if (result.success && result.data) {
+          // Transform database format to component format
+          const transformedInventory = result.data.map((item: any) => ({
+            id: item.id,
+            name: item.title,
+            description: item.description,
+            price: item.price,
+            category: item.category,
+            condition: item.condition,
+            inStock: item.is_available,
+            quantity: 1, // Default quantity since database doesn't have this field
+            image: item.image_url,
+            brand: item.brand,
+            model: item.model,
+            specs: [], // Default empty specs since database doesn't have this field
+            dateAdded: item.created_at?.split('T')[0] || new Date().toISOString().split('T')[0]
+          }))
 
-      if (result.success && result.data) {
-        // Transform database format to component format
-        const transformedInventory = result.data.map((item: any) => ({
-          id: item.id,
-          name: item.title,
-          description: item.description,
-          price: item.price,
-          category: item.category,
-          condition: item.condition,
-          inStock: item.is_available,
-          quantity: 1, // Default quantity since database doesn't have this field
-          image: item.image_url,
-          brand: item.brand,
-          model: item.model,
-          specs: [], // Default empty specs since database doesn't have this field
-          dateAdded: item.created_at?.split('T')[0] || new Date().toISOString().split('T')[0]
-        }))
-
-        setInventory(transformedInventory)
-        setFilteredInventory(transformedInventory)
-      } else {
-        // Fallback to default inventory if database fails
-        console.warn('Failed to load inventory from database, using default data')
-        setInventory(defaultInventory)
-        setFilteredInventory(defaultInventory)
+          // Randomize the inventory order
+          const randomizedInventory = [...transformedInventory].sort(() => Math.random() - 0.5)
+          setInventory(randomizedInventory)
+          setFilteredInventory(randomizedInventory)
+        } else {
+          // No items in database or failed response - show empty inventory
+          setInventory([])
+          setFilteredInventory([])
+        }
+      } catch (error) {
+        // Error loading from database - show empty inventory
+        console.error('Error loading inventory:', error)
+        setInventory([])
+        setFilteredInventory([])
+      } finally {
+        setIsLoading(false)
       }
-    } catch (error) {
-      // Error loading from database - fallback to default data
-      console.error('Error loading inventory:', error)
-      setInventory(defaultInventory)
-      setFilteredInventory(defaultInventory)
     }
-  }
+
+    loadData()
+  }, [])
 
   useEffect(() => {
     // Filter inventory based on search term, category, and condition
@@ -205,7 +209,13 @@ export default function StorePage() {
             </p>
           </div>
 
-          {filteredInventory.length === 0 ? (
+          {isLoading ? (
+            <div className="text-center py-16">
+              <div className="animate-spin rounded-full h-16 w-16 border-4 border-yellow-500 border-t-transparent mx-auto mb-4"></div>
+              <h3 className="text-xl font-semibold text-gray-300 mb-2">Loading inventory...</h3>
+              <p className="text-gray-400">Please wait while we load the latest items</p>
+            </div>
+          ) : filteredInventory.length === 0 ? (
             <div className="text-center py-16">
               <Package className="h-16 w-16 text-gray-500 mx-auto mb-4" />
               <h3 className="text-xl font-semibold text-gray-300 mb-2">No items found</h3>

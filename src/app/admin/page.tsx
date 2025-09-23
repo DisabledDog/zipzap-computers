@@ -10,9 +10,10 @@ export default function AdminPanel() {
   const [activeTab, setActiveTab] = useState<'inventory' | 'gallery'>('inventory')
 
   // Inventory state
-  const [inventory, setInventory] = useState<InventoryItem[]>(defaultInventory)
+  const [inventory, setInventory] = useState<InventoryItem[]>([])
   const [showAddInventoryForm, setShowAddInventoryForm] = useState(false)
   const [editingItem, setEditingItem] = useState<InventoryItem | null>(null)
+  const [unsavedChanges, setUnsavedChanges] = useState<{[key: string]: Partial<InventoryItem>}>({})
   const [inventoryFormData, setInventoryFormData] = useState<InventoryItem>({
     id: '',
     name: '',
@@ -88,6 +89,7 @@ export default function AdminPanel() {
           quantity: 1, // Default quantity
           brand: item.brand,
           model: item.model || '',
+          image: item.image_url || undefined, // Map image_url to image
           specs: [], // Default empty specs
           dateAdded: item.created_at?.split('T')[0] || new Date().toISOString().split('T')[0]
         }))
@@ -168,7 +170,6 @@ export default function AdminPanel() {
         await loadInventory()
         setShowAddInventoryForm(false)
         resetInventoryForm()
-        alert('Inventory item added successfully!')
       } else {
         alert(`Error adding item: ${result.error}`)
       }
@@ -180,8 +181,113 @@ export default function AdminPanel() {
 
   const handleEditInventoryItem = (item: InventoryItem) => {
     setEditingItem(item)
-    setInventoryFormData(item)
+    setInventoryFormData({...item, image: item.image || ''}) // Preserve existing image
     setShowAddInventoryForm(true)
+  }
+
+  const addQuickPreviewItem = async () => {
+    try {
+      // Create a basic preview item
+      const newItem = {
+        title: 'New Item',
+        description: '',
+        price: 0,
+        category: 'Electronics',
+        condition: 'Used',
+        brand: 'Unknown',
+        model: '',
+        image_url: null,
+        is_available: true
+      }
+
+      const response = await fetch('/api/inventory', {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(newItem)
+      })
+
+      const result = await response.json()
+      console.log('API Response:', result) // Debug log
+
+      if (result.success && result.data) {
+        // Transform to admin format and add to inventory
+        const transformedItem = {
+          id: result.data.id.toString(),
+          name: result.data.title,
+          description: result.data.description,
+          price: result.data.price,
+          category: result.data.category,
+          condition: result.data.condition,
+          inStock: result.data.is_available,
+          quantity: 1,
+          brand: result.data.brand,
+          model: result.data.model || '',
+          image: result.data.image_url || undefined,
+          specs: [],
+          dateAdded: result.data.created_at?.split('T')[0] || new Date().toISOString().split('T')[0]
+        }
+
+        setInventory(prev => [transformedItem, ...prev])
+      } else {
+        alert('Failed to create preview item')
+      }
+    } catch (error) {
+      console.error('Error creating preview item:', error)
+      alert('Error creating preview item')
+    }
+  }
+
+  const saveQuickEdit = async (itemId: string) => {
+    const changes = unsavedChanges[itemId]
+    if (!changes) return
+
+    try {
+      const item = inventory.find(inv => inv.id === itemId)
+      if (!item) return
+
+      const updatedItem = { ...item, ...changes }
+
+      // Transform to database format
+      const dbData = {
+        id: updatedItem.id,
+        title: updatedItem.name,
+        description: updatedItem.description,
+        price: updatedItem.price,
+        category: updatedItem.category,
+        condition: updatedItem.condition,
+        brand: updatedItem.brand,
+        model: updatedItem.model,
+        is_available: updatedItem.inStock,
+        image_url: updatedItem.image
+      }
+
+      const response = await fetch('/api/inventory', {
+        method: 'PUT',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(dbData)
+      })
+
+      if (response.ok) {
+        // Update local state
+        const updatedInventory = inventory.map(inv =>
+          inv.id === itemId ? updatedItem : inv
+        )
+        setInventory(updatedInventory)
+
+        // Clear unsaved changes for this item
+        setUnsavedChanges(prev => {
+          const newChanges = { ...prev }
+          delete newChanges[itemId]
+          return newChanges
+        })
+
+      } else {
+        alert('Failed to save item')
+      }
+    } catch (error) {
+      console.error('Error saving item:', error)
+      alert('Error saving item')
+    }
   }
 
   const handleUpdateInventoryItem = async (e: React.FormEvent) => {
@@ -217,7 +323,6 @@ export default function AdminPanel() {
         setShowAddInventoryForm(false)
         setEditingItem(null)
         resetInventoryForm()
-        alert('Inventory item updated successfully!')
       } else {
         alert(`Error updating item: ${result.error}`)
       }
@@ -240,7 +345,6 @@ export default function AdminPanel() {
         if (result.success) {
           // Reload inventory from database
           await loadInventory()
-          alert('Inventory item deleted successfully!')
         } else {
           alert(`Error deleting item: ${result.error}`)
         }
@@ -455,7 +559,6 @@ export default function AdminPanel() {
         await loadGallery()
         setShowAddGalleryForm(false)
         resetGalleryForm()
-        alert('Gallery item added successfully!')
       } else {
         throw new Error(result.error || 'Failed to add gallery item')
       }
@@ -502,7 +605,6 @@ export default function AdminPanel() {
         setShowAddGalleryForm(false)
         setEditingGalleryItem(null)
         resetGalleryForm()
-        alert('Gallery item updated successfully!')
       } else {
         throw new Error(result.error || 'Failed to update gallery item')
       }
@@ -525,7 +627,6 @@ export default function AdminPanel() {
         if (result.success) {
           // Reload gallery to reflect deletion
           await loadGallery()
-          alert('Gallery item deleted successfully!')
         } else {
           throw new Error(result.error || 'Failed to delete gallery item')
         }
@@ -659,7 +760,7 @@ export default function AdminPanel() {
                   </select>
                 </div>
                 <button
-                  onClick={() => setShowAddInventoryForm(true)}
+                  onClick={addQuickPreviewItem}
                   className="bg-yellow-500 text-black px-4 py-2 rounded-md hover:bg-yellow-400 transition-colors flex items-center gap-2 whitespace-nowrap"
                 >
                   <Plus className="h-4 w-4" />
@@ -715,14 +816,13 @@ export default function AdminPanel() {
                     </div>
 
                     <div className="mt-4">
-                      <label className="block text-sm font-bold text-gray-700 mb-2">Description *</label>
+                      <label className="block text-sm font-bold text-gray-700 mb-2">Description (Optional)</label>
                       <textarea
                         value={inventoryFormData.description}
                         onChange={(e) => setInventoryFormData(prev => ({...prev, description: e.target.value}))}
                         className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent text-lg"
                         rows={3}
                         placeholder="Detailed description of the item including condition, what's included, etc."
-                        required
                       />
                     </div>
                   </div>
@@ -986,15 +1086,17 @@ export default function AdminPanel() {
                                   <label className="block text-xs text-gray-600 mb-1">Price ($)</label>
                                   <input
                                     type="number"
-                                    value={item.price}
+                                    value={unsavedChanges[item.id]?.price ?? item.price}
                                     onChange={(e) => {
                                       const newPrice = parseFloat(e.target.value) || 0
-                                      const updatedInventory = inventory.map(inv =>
-                                        inv.id === item.id ? {...inv, price: newPrice} : inv
-                                      )
-                                      saveInventory(updatedInventory)
+                                      setUnsavedChanges(prev => ({
+                                        ...prev,
+                                        [item.id]: { ...prev[item.id], price: newPrice }
+                                      }))
                                     }}
-                                    className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-yellow-500"
+                                    className={`w-full px-2 py-1 text-sm border rounded focus:ring-1 focus:ring-yellow-500 ${
+                                      unsavedChanges[item.id]?.price !== undefined ? 'border-yellow-400 bg-yellow-50' : 'border-gray-300'
+                                    }`}
                                     step="0.01"
                                   />
                                 </div>
@@ -1002,39 +1104,51 @@ export default function AdminPanel() {
                                   <label className="block text-xs text-gray-600 mb-1">Quantity</label>
                                   <input
                                     type="number"
-                                    value={item.quantity}
+                                    value={unsavedChanges[item.id]?.quantity ?? item.quantity}
                                     onChange={(e) => {
                                       const newQuantity = parseInt(e.target.value) || 0
-                                      const updatedInventory = inventory.map(inv =>
-                                        inv.id === item.id ? {...inv, quantity: newQuantity, inStock: newQuantity > 0} : inv
-                                      )
-                                      saveInventory(updatedInventory)
+                                      setUnsavedChanges(prev => ({
+                                        ...prev,
+                                        [item.id]: { ...prev[item.id], quantity: newQuantity, inStock: newQuantity > 0 }
+                                      }))
                                     }}
-                                    className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-yellow-500"
+                                    className={`w-full px-2 py-1 text-sm border rounded focus:ring-1 focus:ring-yellow-500 ${
+                                      unsavedChanges[item.id]?.quantity !== undefined ? 'border-yellow-400 bg-yellow-50' : 'border-gray-300'
+                                    }`}
                                     min="0"
                                   />
                                 </div>
                                 <div>
                                   <label className="block text-xs text-gray-600 mb-1">Status</label>
                                   <select
-                                    value={item.inStock ? 'in-stock' : 'out-of-stock'}
+                                    value={(unsavedChanges[item.id]?.inStock ?? item.inStock) ? 'in-stock' : 'out-of-stock'}
                                     onChange={(e) => {
                                       const inStock = e.target.value === 'in-stock'
-                                      const updatedInventory = inventory.map(inv =>
-                                        inv.id === item.id ? {...inv, inStock} : inv
-                                      )
-                                      saveInventory(updatedInventory)
+                                      setUnsavedChanges(prev => ({
+                                        ...prev,
+                                        [item.id]: { ...prev[item.id], inStock }
+                                      }))
                                     }}
-                                    className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-1 focus:ring-yellow-500"
+                                    className={`w-full px-2 py-1 text-sm border rounded focus:ring-1 focus:ring-yellow-500 ${
+                                      unsavedChanges[item.id]?.inStock !== undefined ? 'border-yellow-400 bg-yellow-50' : 'border-gray-300'
+                                    }`}
                                   >
                                     <option value="in-stock">In Stock</option>
                                     <option value="out-of-stock">Out of Stock</option>
                                   </select>
                                 </div>
-                                <div className="flex items-end">
+                                <div className="flex flex-col gap-1">
+                                  {unsavedChanges[item.id] && (
+                                    <button
+                                      onClick={() => saveQuickEdit(item.id)}
+                                      className="bg-green-500 hover:bg-green-400 text-white px-2 py-1 rounded text-sm font-medium transition-colors"
+                                    >
+                                      Save
+                                    </button>
+                                  )}
                                   <button
                                     onClick={() => handleEditInventoryItem(item)}
-                                    className="w-full bg-yellow-500 hover:bg-yellow-400 text-black px-2 py-1 rounded text-sm font-medium transition-colors"
+                                    className="bg-yellow-500 hover:bg-yellow-400 text-black px-2 py-1 rounded text-sm font-medium transition-colors"
                                   >
                                     Full Edit
                                   </button>
