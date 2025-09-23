@@ -373,10 +373,10 @@ export default function AdminPanel() {
   }
 
   const validateImageFile = (file: File): string | null => {
-    // File size validation (5MB max)
-    const maxSize = 5 * 1024 * 1024
+    // File size validation (20MB max)
+    const maxSize = 20 * 1024 * 1024
     if (file.size > maxSize) {
-      return 'File size must be less than 5MB'
+      return 'File size must be less than 20MB'
     }
 
     // File type validation - only allow specific image types
