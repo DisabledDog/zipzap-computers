@@ -160,6 +160,27 @@ export default function StorePage() {
               Quality pre-owned and new electronics with warranty coverage. All devices tested and guaranteed to work perfectly.
             </p>
 
+            {/* Financing Banner */}
+            <div className="max-w-2xl mx-auto mb-10">
+              <div className="bg-black text-white rounded-xl p-4 shadow-lg border-2 border-yellow-500">
+                <div className="flex items-center justify-center gap-4">
+                  <div className="text-3xl">💳</div>
+                  <div>
+                    <p className="font-bold text-xl">Need Financing?</p>
+                    <p className="text-base text-gray-300 font-medium">Easy payment plans available</p>
+                  </div>
+                  <a
+                    href="https://ecom.acima.com/views/application/loca-5d27a3ae-98dc-48b3-b25e-9f74f6606deb"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-yellow-500 text-black px-4 py-2 rounded-lg font-semibold text-sm hover:bg-yellow-400 transition-colors shadow-md"
+                  >
+                    Apply Now
+                  </a>
+                </div>
+              </div>
+            </div>
+
             {/* Integrated Search */}
             <div className="max-w-2xl mx-auto mb-8">
               <div className="relative">

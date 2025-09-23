@@ -37,6 +37,9 @@ export default function Reviews() {
       localStorage.removeItem('zipzap_reviews')
       setReviews(defaultReviews)
     }
+
+    // Fetch Google reviews automatically
+    fetchGoogleReviews()
   }, [])
 
   const fetchGoogleReviews = async () => {
@@ -300,7 +303,7 @@ export default function Reviews() {
                 Call (503) 400-9920
               </a>
               <a
-                href="/contact"
+                href="/#quote-form"
                 className="bg-white border-2 border-yellow-500 text-black hover:bg-yellow-50 px-8 py-4 rounded-xl font-semibold text-lg transition-colors shadow-lg"
               >
                 Book Your Repair
