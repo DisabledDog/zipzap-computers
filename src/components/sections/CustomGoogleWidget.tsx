@@ -252,7 +252,7 @@ export default function CustomGoogleWidget() {
                 </div>
                 <div className="flex items-center gap-3 text-slate-300">
                   <Clock className="h-5 w-5 text-yellow-400" />
-                  <span>Mon-Fri: 10AM-6PM, Sat: 11AM-5PM</span>
+                  <span>Mon-Fri: 10AM-6PM, Sat: 12PM-6PM</span>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="flex">

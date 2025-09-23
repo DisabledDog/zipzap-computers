@@ -44,7 +44,7 @@ export default function Header() {
           </div>
           <div className="flex items-center gap-1">
             <Clock className="h-3 w-3 text-yellow-500" />
-            <span>Mon-Fri: 10AM-6PM | Sat: 11AM-5PM</span>
+            <span>Mon-Fri: 10AM-6PM | Sat: 12PM-6PM</span>
           </div>
         </div>
       </div>
