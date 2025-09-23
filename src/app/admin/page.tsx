@@ -60,7 +60,8 @@ export default function AdminPanel() {
 
   // Helper function to create auth headers for API calls
   const getAuthHeaders = () => {
-    const credentials = btoa(`admin:${process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'ZipZap2024!SecureAdminPass'}`)
+    const adminPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'ZipZap2024!SecureAdminPass'
+    const credentials = btoa(`admin:${adminPassword}`)
     return {
       'Authorization': `Basic ${credentials}`,
       'Content-Type': 'application/json'
