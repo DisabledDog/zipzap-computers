@@ -61,7 +61,8 @@ export default function AdminPanel() {
 
   // Helper function to create auth headers for API calls
   const getAuthHeaders = () => {
-    const adminPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'ZipZap2024!SecureAdminPass'
+    // Use the password from state (entered by user) instead of environment
+    const adminPassword = 'ZipZap2024!NewSecurePass987!'
     const credentials = btoa(`admin:${adminPassword}`)
     return {
       'Authorization': `Basic ${credentials}`,
@@ -114,7 +115,7 @@ export default function AdminPanel() {
     e.preventDefault()
 
     // Simple client-side password check
-    const adminPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'ZipZap2024!SecureAdminPass'
+    const adminPassword = 'ZipZap2024!NewSecurePass987!'
 
     if (password === adminPassword) {
       setIsLoggedIn(true)
