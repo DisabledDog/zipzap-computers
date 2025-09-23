@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getInventory, getAllInventory, addInventoryItem, updateInventoryItem, deleteInventoryItem } from '@/lib/database'
 
-// Simple auth check using environment password (temporary fix)
+// Simple auth check using environment password
 function isAuthorized(request: NextRequest): boolean {
   const authHeader = request.headers.get('authorization')
   if (!authHeader) return false
@@ -10,7 +10,7 @@ function isAuthorized(request: NextRequest): boolean {
   if (type !== 'Basic') return false
 
   const [username, password] = Buffer.from(credentials, 'base64').toString().split(':')
-  const serverPassword = process.env.ZIPZAP_ADMIN_PASSWORD || process.env.NEXT_PUBLIC_ADMIN_PASSWORD
+  const serverPassword = process.env.ZIPZAP_ADMIN_PASSWORD
   return password === serverPassword
 }
 

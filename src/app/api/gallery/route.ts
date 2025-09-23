@@ -10,7 +10,7 @@ function isAuthorized(request: NextRequest): boolean {
   if (type !== 'Basic') return false
 
   const [username, password] = Buffer.from(credentials, 'base64').toString().split(':')
-  const serverPassword = process.env.ZIPZAP_ADMIN_PASSWORD || process.env.NEXT_PUBLIC_ADMIN_PASSWORD
+  const serverPassword = process.env.ZIPZAP_ADMIN_PASSWORD
   return password === serverPassword
 }
 
