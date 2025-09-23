@@ -8,7 +8,6 @@ export default function AdminPanel() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [password, setPassword] = useState('')
   const [activeTab, setActiveTab] = useState<'inventory' | 'gallery'>('inventory')
-  const [csrfToken, setCsrfToken] = useState('')
 
   // Inventory state
   const [inventory, setInventory] = useState<InventoryItem[]>(defaultInventory)
@@ -50,10 +49,13 @@ export default function AdminPanel() {
   })
 
   useEffect(() => {
-    // Check if already logged in via server session
-    checkAuthStatus()
-    // Get CSRF token for login
-    getCsrfToken()
+    // Check if already logged in via localStorage
+    const savedLogin = localStorage.getItem('zipzap_admin_logged_in')
+    if (savedLogin === 'true') {
+      setIsLoggedIn(true)
+      loadInventory()
+      loadGallery()
+    }
   }, [])
 
   // Helper function to create auth headers for API calls
@@ -65,35 +67,7 @@ export default function AdminPanel() {
     }
   }
 
-  const getCsrfToken = async () => {
-    try {
-      const response = await fetch('/api/admin/auth', { method: 'PUT' })
-      const data = await response.json()
-      if (data.csrfToken) {
-        setCsrfToken(data.csrfToken)
-        return data.csrfToken
-      }
-    } catch (error) {
-      console.error('Failed to get CSRF token:', error)
-    }
-    return null
-  }
 
-  const checkAuthStatus = async () => {
-    try {
-      const response = await fetch('/api/admin/auth')
-      const data = await response.json()
-
-      if (data.authenticated) {
-        setIsLoggedIn(true)
-        loadInventory()
-        loadGallery()
-      }
-    } catch (error) {
-      // Auth check failed - redirecting to login
-      setIsLoggedIn(false)
-    }
-  }
 
   const loadInventory = async () => {
     try {
@@ -136,56 +110,23 @@ export default function AdminPanel() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    let tokenToUse = csrfToken
-    if (!tokenToUse) {
-      // Try to get CSRF token again if we don't have one
-      tokenToUse = await getCsrfToken()
-      if (!tokenToUse) {
-        alert('Unable to get security token. Please refresh the page.')
-        return
-      }
-    }
+    // Simple client-side password check
+    const adminPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'ZipZap2024!SecureAdminPass'
 
-    try {
-      const response = await fetch('/api/admin/auth', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ password, csrfToken: tokenToUse }),
-      })
-
-      const data = await response.json()
-
-      if (response.ok && data.success) {
-        setIsLoggedIn(true)
-        setPassword('')
-        loadInventory()
-        loadGallery()
-      } else {
-        alert(data.error || 'Login failed')
-        setPassword('')
-        // Get a new CSRF token after failed attempt
-        await getCsrfToken()
-      }
-    } catch (error) {
-      // Login failed
-      alert('Login failed. Please try again.')
+    if (password === adminPassword) {
+      setIsLoggedIn(true)
       setPassword('')
-      // Get a new CSRF token after failed attempt
-      await getCsrfToken()
+      localStorage.setItem('zipzap_admin_logged_in', 'true')
+      loadInventory()
+      await loadGallery()
+    } else {
+      alert('Invalid password')
+      setPassword('')
     }
   }
 
-  const handleLogout = async () => {
-    try {
-      await fetch('/api/admin/auth', {
-        method: 'DELETE',
-      })
-    } catch (error) {
-      // Logout error
-    }
-
+  const handleLogout = () => {
+    localStorage.removeItem('zipzap_admin_logged_in')
     setIsLoggedIn(false)
     setPassword('')
   }
@@ -381,21 +322,38 @@ export default function AdminPanel() {
   }
 
   // Gallery functions
-  const loadGallery = () => {
+  const loadGallery = async () => {
     try {
-      const savedGallery = localStorage.getItem('zipzap_gallery')
-      if (savedGallery && savedGallery.trim() !== '') {
-        setGalleryItems(JSON.parse(savedGallery))
+      const response = await fetch('/api/gallery')
+      const result = await response.json()
+
+      if (result.success && result.data) {
+        // Transform database format to admin format
+        const transformedGallery = result.data.map((item: any) => ({
+          id: item.id.toString(),
+          title: item.title,
+          description: item.description,
+          beforeImage: item.before_image_url,
+          afterImage: item.after_image_url,
+          createdAt: item.created_at
+        }))
+
+        setGalleryItems(transformedGallery)
       }
     } catch (error) {
-      // Error loading gallery - using empty state
+      console.error('Error loading gallery from database:', error)
+      // Fallback to localStorage for backwards compatibility
+      try {
+        const savedGallery = localStorage.getItem('zipzap_gallery')
+        if (savedGallery && savedGallery.trim() !== '') {
+          setGalleryItems(JSON.parse(savedGallery))
+        }
+      } catch (localError) {
+        console.error('Error loading from localStorage:', localError)
+      }
     }
   }
 
-  const saveGallery = (newGallery: GalleryItem[]) => {
-    localStorage.setItem('zipzap_gallery', JSON.stringify(newGallery))
-    setGalleryItems(newGallery)
-  }
 
   const compressImage = (file: File, maxWidth: number = 800, quality: number = 0.7): Promise<string> => {
     return new Promise((resolve) => {
@@ -467,26 +425,43 @@ export default function AdminPanel() {
     }
   }
 
-  const handleAddGalleryItem = (e: React.FormEvent) => {
+  const handleAddGalleryItem = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!galleryFormData.title || !galleryFormData.beforeImage || !galleryFormData.afterImage) {
       alert('Please fill in all required fields and upload both images')
       return
     }
 
-    const newItem: GalleryItem = {
-      id: Date.now().toString(),
-      title: galleryFormData.title!,
-      description: galleryFormData.description,
-      beforeImage: galleryFormData.beforeImage!,
-      afterImage: galleryFormData.afterImage!,
-      createdAt: new Date().toISOString()
-    }
+    try {
+      // Transform admin format to database format
+      const galleryData = {
+        title: galleryFormData.title!,
+        description: galleryFormData.description || null,
+        before_image_url: galleryFormData.beforeImage!,
+        after_image_url: galleryFormData.afterImage!
+      }
 
-    const newGallery = [...galleryItems, newItem]
-    saveGallery(newGallery)
-    setShowAddGalleryForm(false)
-    resetGalleryForm()
+      const response = await fetch('/api/gallery', {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(galleryData)
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        // Reload gallery to show new item
+        await loadGallery()
+        setShowAddGalleryForm(false)
+        resetGalleryForm()
+        alert('Gallery item added successfully!')
+      } else {
+        throw new Error(result.error || 'Failed to add gallery item')
+      }
+    } catch (error) {
+      console.error('Error adding gallery item:', error)
+      alert(`Error adding item: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    }
   }
 
   const handleEditGalleryItem = (item: GalleryItem) => {
@@ -495,34 +470,68 @@ export default function AdminPanel() {
     setShowAddGalleryForm(true)
   }
 
-  const handleUpdateGalleryItem = (e: React.FormEvent) => {
+  const handleUpdateGalleryItem = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!editingGalleryItem || !galleryFormData.title || !galleryFormData.beforeImage || !galleryFormData.afterImage) {
       alert('Please fill in all required fields and upload both images')
       return
     }
 
-    const updatedItem: GalleryItem = {
-      ...editingGalleryItem,
-      title: galleryFormData.title!,
-      description: galleryFormData.description,
-      beforeImage: galleryFormData.beforeImage!,
-      afterImage: galleryFormData.afterImage!
-    }
+    try {
+      // Transform admin format to database format
+      const updates = {
+        id: editingGalleryItem.id,
+        title: galleryFormData.title!,
+        description: galleryFormData.description || null,
+        before_image_url: galleryFormData.beforeImage!,
+        after_image_url: galleryFormData.afterImage!
+      }
 
-    const updatedGallery = galleryItems.map(item =>
-      item.id === editingGalleryItem.id ? updatedItem : item
-    )
-    saveGallery(updatedGallery)
-    setShowAddGalleryForm(false)
-    setEditingGalleryItem(null)
-    resetGalleryForm()
+      const response = await fetch('/api/gallery', {
+        method: 'PUT',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(updates)
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        // Reload gallery to show updated item
+        await loadGallery()
+        setShowAddGalleryForm(false)
+        setEditingGalleryItem(null)
+        resetGalleryForm()
+        alert('Gallery item updated successfully!')
+      } else {
+        throw new Error(result.error || 'Failed to update gallery item')
+      }
+    } catch (error) {
+      console.error('Error updating gallery item:', error)
+      alert(`Error updating item: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    }
   }
 
-  const handleDeleteGalleryItem = (itemToDelete: GalleryItem) => {
+  const handleDeleteGalleryItem = async (itemToDelete: GalleryItem) => {
     if (confirm('Are you sure you want to delete this gallery item?')) {
-      const updatedGallery = galleryItems.filter(item => item.id !== itemToDelete.id)
-      saveGallery(updatedGallery)
+      try {
+        const response = await fetch(`/api/gallery?id=${itemToDelete.id}`, {
+          method: 'DELETE',
+          headers: getAuthHeaders()
+        })
+
+        const result = await response.json()
+
+        if (result.success) {
+          // Reload gallery to reflect deletion
+          await loadGallery()
+          alert('Gallery item deleted successfully!')
+        } else {
+          throw new Error(result.error || 'Failed to delete gallery item')
+        }
+      } catch (error) {
+        console.error('Error deleting gallery item:', error)
+        alert(`Error deleting item: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      }
     }
   }
 
