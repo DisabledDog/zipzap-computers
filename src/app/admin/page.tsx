@@ -56,6 +56,15 @@ export default function AdminPanel() {
     getCsrfToken()
   }, [])
 
+  // Helper function to create auth headers for API calls
+  const getAuthHeaders = () => {
+    const credentials = btoa(`admin:${process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'ZipZap2024!SecureAdminPass'}`)
+    return {
+      'Authorization': `Basic ${credentials}`,
+      'Content-Type': 'application/json'
+    }
+  }
+
   const getCsrfToken = async () => {
     try {
       const response = await fetch('/api/admin/auth', { method: 'PUT' })
@@ -206,9 +215,7 @@ export default function AdminPanel() {
 
       const response = await fetch('/api/inventory', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify(dbData)
       })
 
@@ -256,9 +263,7 @@ export default function AdminPanel() {
 
       const response = await fetch('/api/inventory', {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify(dbData)
       })
 
@@ -284,7 +289,8 @@ export default function AdminPanel() {
     if (confirm('Are you sure you want to delete this item?')) {
       try {
         const response = await fetch(`/api/inventory?id=${itemToDelete.id}`, {
-          method: 'DELETE'
+          method: 'DELETE',
+          headers: getAuthHeaders()
         })
 
         const result = await response.json()
