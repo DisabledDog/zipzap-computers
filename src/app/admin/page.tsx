@@ -734,7 +734,17 @@ export default function AdminPanel() {
         {activeTab === 'inventory' && (
           <div>
             <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center mb-6 gap-4">
-              <h2 className="text-xl font-semibold">Manage Inventory</h2>
+              <div className="flex items-center gap-4">
+                <h2 className="text-xl font-semibold">Manage Inventory</h2>
+                <div className="flex gap-2">
+                  <div className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                    {inventory.length} Items
+                  </div>
+                  <div className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
+                    ${inventory.reduce((total, item) => total + (item.price * item.quantity), 0).toFixed(2)} Total Value
+                  </div>
+                </div>
+              </div>
               <div className="flex flex-col sm:flex-row gap-4">
                 {/* Quick Edit Dropdown */}
                 <div className="flex-1 lg:w-80">
