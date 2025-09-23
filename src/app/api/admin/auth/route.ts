@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import bcrypt from 'bcryptjs'
 import { supabaseAdmin } from '@/lib/supabase'
+import { adminSessions, generateSessionToken } from '@/lib/auth'
 
 // Rate limiting storage
 const loginAttempts = new Map<string, { count: number, lastAttempt: number }>()
@@ -100,7 +101,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify admin credentials using secure database authentication
+    console.log('Attempting to verify credentials for password length:', password?.length)
     const isValidCredentials = await verifyAdminCredentials(password)
+    console.log('Credential verification result:', isValidCredentials)
 
     if (isValidCredentials) {
       // Clear failed attempts on successful login
@@ -126,7 +129,7 @@ export async function POST(request: NextRequest) {
       })
 
       // Store session in memory (in production, use Redis or database)
-      adminSessions.set(sessionToken, { expires: expirationTime })
+      adminSessions.setSession(sessionToken, expirationTime)
 
       return NextResponse.json({ success: true })
     } else {
@@ -160,10 +163,10 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ authenticated: false }, { status: 401 })
     }
 
-    const session = adminSessions.get(sessionToken)
+    const session = adminSessions.getSession(sessionToken)
     if (!session || session.expires < Date.now()) {
       // Clean up expired session
-      adminSessions.delete(sessionToken)
+      adminSessions.deleteSession(sessionToken)
       return NextResponse.json({ authenticated: false }, { status: 401 })
     }
 
@@ -205,7 +208,7 @@ export async function DELETE(request: NextRequest) {
     const sessionToken = cookieStore.get('zipzap_admin_session')?.value
 
     if (sessionToken) {
-      adminSessions.delete(sessionToken)
+      adminSessions.deleteSession(sessionToken)
     }
 
     // Clear cookie
@@ -220,13 +223,6 @@ export async function DELETE(request: NextRequest) {
   }
 }
 
-// Simple session storage (use Redis/database in production)
-const adminSessions = new Map<string, { expires: number }>()
-
-function generateSessionToken(): string {
-  // Use crypto.randomUUID for cryptographically secure tokens
-  return crypto.randomUUID() + '-' + crypto.randomUUID()
-}
 
 // Enhanced admin authentication with database
 async function verifyAdminCredentials(password: string): Promise<boolean> {

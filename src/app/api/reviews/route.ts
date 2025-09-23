@@ -1,17 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getReviews, addReview, updateReview, deleteReview } from '@/lib/database'
-import { cookies } from 'next/headers'
-
-// Helper function to check admin authentication
-async function isAdminAuthenticated(): Promise<boolean> {
-  try {
-    const cookieStore = await cookies()
-    const sessionToken = cookieStore.get('zipzap_admin_session')?.value
-    return !!sessionToken
-  } catch {
-    return false
-  }
-}
+import { isAdminAuthenticated } from '@/lib/auth'
 
 // GET - Fetch reviews (public endpoint)
 export async function GET() {

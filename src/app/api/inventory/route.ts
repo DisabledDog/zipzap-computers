@@ -1,19 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getInventory, getAllInventory, addInventoryItem, updateInventoryItem, deleteInventoryItem } from '@/lib/database'
-import { cookies } from 'next/headers'
 
-// Helper function to check admin authentication
-async function isAdminAuthenticated(): Promise<boolean> {
-  try {
-    const cookieStore = await cookies()
-    const sessionToken = cookieStore.get('zipzap_admin_session')?.value
+// Simple auth check using environment password (temporary fix)
+function isAuthorized(request: NextRequest): boolean {
+  const authHeader = request.headers.get('authorization')
+  if (!authHeader) return false
 
-    // This should check against your session storage
-    // For now, we'll implement a basic check
-    return !!sessionToken
-  } catch {
-    return false
-  }
+  const [type, credentials] = authHeader.split(' ')
+  if (type !== 'Basic') return false
+
+  const [username, password] = Buffer.from(credentials, 'base64').toString().split(':')
+  return password === process.env.ZIPZAP_ADMIN_PASSWORD
 }
 
 // GET - Fetch inventory (public endpoint)
@@ -41,7 +38,7 @@ export async function GET(request: NextRequest) {
 // POST - Add inventory item (admin only)
 export async function POST(request: NextRequest) {
   try {
-    const isAdmin = await isAdminAuthenticated()
+    const isAdmin = isAuthorized(request)
     if (!isAdmin) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized' },
@@ -94,7 +91,7 @@ export async function POST(request: NextRequest) {
 // PUT - Update inventory item (admin only)
 export async function PUT(request: NextRequest) {
   try {
-    const isAdmin = await isAdminAuthenticated()
+    const isAdmin = isAuthorized(request)
     if (!isAdmin) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized' },
@@ -143,7 +140,7 @@ export async function PUT(request: NextRequest) {
 // DELETE - Delete inventory item (admin only)
 export async function DELETE(request: NextRequest) {
   try {
-    const isAdmin = await isAdminAuthenticated()
+    const isAdmin = isAuthorized(request)
     if (!isAdmin) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized' },

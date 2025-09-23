@@ -76,6 +76,7 @@ export async function deleteInventoryItem(id: string): Promise<void> {
 
     if (error) throw error
   } catch (error) {
+    console.error('Error deleting inventory item:', error)
     handleSupabaseError(error, 'delete inventory item')
   }
 }
