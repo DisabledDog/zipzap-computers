@@ -31,22 +31,22 @@ export default function Footer() {
                 Home
               </Link>
               <Link
-                href="/repairs"
+                href="/services"
                 className="text-gray-300 hover:text-yellow-500 transition-colors"
               >
-                Repairs
+                Services
               </Link>
               <Link
-                href="/about"
+                href="/store"
                 className="text-gray-300 hover:text-yellow-500 transition-colors"
               >
-                About
+                Store
               </Link>
               <Link
-                href="/warranty"
+                href="/gallery"
                 className="text-gray-300 hover:text-yellow-500 transition-colors"
               >
-                Warranty
+                Gallery
               </Link>
             </nav>
           </div>

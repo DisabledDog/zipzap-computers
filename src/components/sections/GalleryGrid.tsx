@@ -21,16 +21,49 @@ export default function GalleryGrid() {
 
   const loadGalleryItems = async () => {
     try {
-      const savedGallery = localStorage.getItem('zipzap_gallery')
-      if (savedGallery && savedGallery.trim() !== '') {
-        const galleryData = JSON.parse(savedGallery)
-        setGalleryItems(galleryData)
+      // Load gallery from database (modern approach)
+      const response = await fetch('/api/gallery')
+      const result = await response.json()
+
+      if (result.success && result.data) {
+        // Transform database format to component format
+        const transformedGallery = result.data.map((item: any) => ({
+          id: item.id.toString(),
+          title: item.title,
+          description: item.description,
+          beforeImage: item.before_image_url,
+          afterImage: item.after_image_url,
+          createdAt: item.created_at
+        }))
+        setGalleryItems(transformedGallery)
       } else {
-        setGalleryItems([])
+        // No items in database - try localStorage fallback
+        try {
+          const savedGallery = localStorage.getItem('zipzap_gallery')
+          if (savedGallery && savedGallery.trim() !== '') {
+            const galleryData = JSON.parse(savedGallery)
+            setGalleryItems(galleryData)
+          } else {
+            setGalleryItems([])
+          }
+        } catch (localError) {
+          setGalleryItems([])
+        }
       }
       setLoading(false)
     } catch (error) {
-      // Failed to load gallery items - continuing with empty state
+      // Error loading from database - try localStorage fallback
+      try {
+        const savedGallery = localStorage.getItem('zipzap_gallery')
+        if (savedGallery && savedGallery.trim() !== '') {
+          const galleryData = JSON.parse(savedGallery)
+          setGalleryItems(galleryData)
+        } else {
+          setGalleryItems([])
+        }
+      } catch (localError) {
+        setGalleryItems([])
+      }
       setLoading(false)
     }
   }

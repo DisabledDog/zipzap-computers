@@ -18,8 +18,12 @@ export async function GET() {
     const data = await response.json()
 
     if (data.status === 'OK' && data.result.reviews) {
+      // Log debug info to see what Google is returning
+      console.log('Total reviews from Google:', data.result.reviews.length)
+      console.log('Review ratings:', data.result.reviews.map((r: any) => r.rating))
+
       // Filter for 5-star reviews only and return up to 6
-      const reviews = data.result.reviews
+      const fiveStarReviews = data.result.reviews
         .filter((review: any) => review.rating === 5)
         .slice(0, 6)
         .map((review: any) => ({
@@ -31,9 +35,11 @@ export async function GET() {
         profile_photo_url: review.profile_photo_url
       }))
 
+      console.log('Filtered 5-star reviews:', fiveStarReviews.length)
+
       return NextResponse.json({
         success: true,
-        reviews,
+        reviews: fiveStarReviews,
         rating: data.result.rating,
         user_ratings_total: data.result.user_ratings_total
       })
