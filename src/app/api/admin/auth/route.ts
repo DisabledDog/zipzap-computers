@@ -254,7 +254,7 @@ async function verifyAdminCredentials(password: string): Promise<boolean> {
     if (error || !adminUser) {
       console.log('Admin user not found in database, checking environment password again')
       // Double-check environment password as fallback
-      return envPassword && password === envPassword
+      return Boolean(envPassword && password === envPassword)
     }
 
     // Verify password against hash
@@ -265,7 +265,7 @@ async function verifyAdminCredentials(password: string): Promise<boolean> {
     console.error('Error verifying admin credentials:', error)
     // Fallback to environment password if database fails
     const envPassword = process.env.ZIPZAP_ADMIN_PASSWORD
-    return envPassword && password === envPassword
+    return Boolean(envPassword && password === envPassword)
   }
 }
 

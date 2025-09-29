@@ -19,6 +19,7 @@ export async function getInventory(): Promise<InventoryItem[]> {
     return data || []
   } catch (error) {
     handleSupabaseError(error, 'fetch inventory')
+    return []
   }
 }
 
@@ -33,6 +34,7 @@ export async function getAllInventory(): Promise<InventoryItem[]> {
     return data || []
   } catch (error) {
     handleSupabaseError(error, 'fetch all inventory')
+    return []
   }
 }
 
@@ -48,6 +50,7 @@ export async function addInventoryItem(item: Omit<InventoryItem, 'id' | 'created
     return data
   } catch (error) {
     handleSupabaseError(error, 'add inventory item')
+    throw error
   }
 }
 
@@ -64,6 +67,7 @@ export async function updateInventoryItem(id: string, updates: Partial<Inventory
     return data
   } catch (error) {
     handleSupabaseError(error, 'update inventory item')
+    throw error
   }
 }
 
@@ -78,6 +82,7 @@ export async function deleteInventoryItem(id: string): Promise<void> {
   } catch (error) {
     console.error('Error deleting inventory item:', error)
     handleSupabaseError(error, 'delete inventory item')
+    throw error
   }
 }
 
@@ -93,6 +98,7 @@ export async function getReviews(): Promise<Review[]> {
     return data || []
   } catch (error) {
     handleSupabaseError(error, 'fetch reviews')
+    return []
   }
 }
 
@@ -108,6 +114,7 @@ export async function addReview(review: Omit<Review, 'id' | 'created_at' | 'upda
     return data
   } catch (error) {
     handleSupabaseError(error, 'add review')
+    throw error
   }
 }
 
@@ -124,6 +131,7 @@ export async function updateReview(id: string, updates: Partial<Review>): Promis
     return data
   } catch (error) {
     handleSupabaseError(error, 'update review')
+    throw error
   }
 }
 
@@ -137,6 +145,7 @@ export async function deleteReview(id: string): Promise<void> {
     if (error) throw error
   } catch (error) {
     handleSupabaseError(error, 'delete review')
+    throw error
   }
 }
 
@@ -152,6 +161,7 @@ export async function getGalleryItems(): Promise<GalleryItem[]> {
     return data || []
   } catch (error) {
     handleSupabaseError(error, 'fetch gallery items')
+    return []
   }
 }
 
@@ -167,6 +177,7 @@ export async function addGalleryItem(item: Omit<GalleryItem, 'id' | 'created_at'
     return data
   } catch (error) {
     handleSupabaseError(error, 'add gallery item')
+    throw error
   }
 }
 
@@ -183,6 +194,7 @@ export async function updateGalleryItem(id: string, updates: Partial<GalleryItem
     return data
   } catch (error) {
     handleSupabaseError(error, 'update gallery item')
+    throw error
   }
 }
 
@@ -196,6 +208,7 @@ export async function deleteGalleryItem(id: string): Promise<void> {
     if (error) throw error
   } catch (error) {
     handleSupabaseError(error, 'delete gallery item')
+    throw error
   }
 }
 
@@ -232,5 +245,6 @@ export async function uploadImage(file: File, bucket: string, path: string): Pro
     return urlData.publicUrl
   } catch (error) {
     handleSupabaseError(error, 'upload image')
+    throw error
   }
 }
