@@ -27,7 +27,7 @@ const services = [
 
 export default function Services() {
   return (
-    <section id="services" className="py-20 bg-black relative overflow-hidden">
+    <section id="services" className="py-12 sm:py-16 lg:py-20 bg-black relative overflow-hidden">
       {/* Hexagonal Honeycomb Background */}
       <div className="absolute inset-0 opacity-30">
         <svg className="w-full h-full" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
@@ -74,19 +74,19 @@ export default function Services() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Section Header */}
-        <div className="text-center space-y-6 mb-16">
-          <div className="bg-yellow-500 text-black py-12 px-8 rounded-2xl mx-auto max-w-4xl shadow-2xl border-4 border-yellow-400">
-            <h2 className="text-4xl lg:text-6xl font-heading font-black mb-6 tracking-tight">
+        <div className="text-center space-y-6 mb-12 lg:mb-16">
+          <div className="bg-yellow-500 text-black py-8 sm:py-10 lg:py-12 px-4 sm:px-6 lg:px-8 rounded-2xl mx-auto max-w-4xl shadow-2xl border-4 border-yellow-400">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-6xl font-heading font-black mb-4 sm:mb-6 tracking-tight">
               Expert Repair <span className="text-gray-800">Services</span>
             </h2>
-            <p className="text-xl lg:text-2xl font-semibold max-w-3xl mx-auto leading-relaxed">
+            <p className="text-base sm:text-lg lg:text-xl xl:text-2xl font-semibold max-w-3xl mx-auto leading-relaxed">
               Professional repairs for all your electronic devices with fast turnaround times and lifetime warranty coverage.
             </p>
           </div>
         </div>
 
         {/* Services Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
           {services.map((service, index) => {
             const IconComponent = service.icon
             return (
@@ -134,13 +134,13 @@ export default function Services() {
 
         {/* Bottom CTA */}
         <div className="text-center mt-16">
-          <a
-            href="#services"
+          <Link
+            href="/services"
             className="bg-black text-white hover:bg-gray-700 px-8 py-4 rounded-xl font-semibold text-lg transition-colors inline-flex items-center gap-2"
           >
             View All Services
             <ArrowRight className="h-5 w-5" />
-          </a>
+          </Link>
         </div>
       </div>
     </section>

@@ -29,22 +29,38 @@ export default function Header() {
     <>
       {/* Business Info Bar */}
       <div className="bg-gray-900 text-white py-2 px-4">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center text-sm space-y-1 sm:space-y-0">
-          <div className="flex items-center gap-4">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center text-xs sm:text-sm space-y-1 sm:space-y-0">
+          {/* Mobile: Show phone and address */}
+          <div className="flex sm:hidden flex-col items-center gap-1 text-center">
+            <div className="flex items-center gap-1">
+              <Phone className="h-3 w-3 text-yellow-500" />
+              <a href="tel:5034009920" className="hover:text-yellow-500 transition-colors font-medium">
+                (503) 400-9920
+              </a>
+            </div>
+            <div className="flex items-center gap-1">
+              <MapPin className="h-3 w-3 text-yellow-500" />
+              <span className="text-gray-300 text-xs">3945 Rich Dr NE B, Salem, OR</span>
+            </div>
+          </div>
+
+          {/* Desktop: Show all information */}
+          <div className="hidden sm:flex items-center gap-4">
             <div className="flex items-center gap-1">
               <Phone className="h-3 w-3 text-yellow-500" />
               <a href="tel:5034009920" className="hover:text-yellow-500 transition-colors">
                 (503) 400-9920
               </a>
             </div>
-            <div className="flex items-center gap-1">
+            <div className="hidden md:flex items-center gap-1">
               <MapPin className="h-3 w-3 text-yellow-500" />
               <span>3945 Rich Dr NE B, Salem, OR 97305</span>
             </div>
           </div>
-          <div className="flex items-center gap-1">
+          <div className="hidden sm:flex items-center gap-1">
             <Clock className="h-3 w-3 text-yellow-500" />
-            <span>Mon-Fri: 10AM-6PM | Sat: 12PM-6PM</span>
+            <span className="hidden md:inline">Mon-Fri: 10AM-6PM | Sat: 12PM-6PM</span>
+            <span className="md:hidden">Mon-Fri: 10-6 | Sat: 12-6</span>
           </div>
         </div>
       </div>

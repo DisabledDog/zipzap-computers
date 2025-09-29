@@ -168,9 +168,6 @@ export default function Reviews() {
             <h2 className="text-3xl lg:text-5xl font-heading font-bold mb-4">
               What Our Customers Say
             </h2>
-            {isLoadingGoogle && (
-              <p className="text-sm opacity-70 animate-pulse">Loading latest Google Reviews...</p>
-            )}
             <p className="text-xl max-w-3xl mx-auto">
               Don&apos;t just take our word for it - see why Salem trusts ZipZap with their devices
             </p>
@@ -196,7 +193,8 @@ export default function Reviews() {
           </div>
         </div>
 
-        {/* Reviews Grid */}
+
+        {/* Custom Reviews Grid */}
         {reviews.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {reviews.map((review, index) => (

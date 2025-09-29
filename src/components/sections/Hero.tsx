@@ -2,10 +2,14 @@
 
 import Link from 'next/link'
 import { Phone, ArrowRight } from 'lucide-react'
+import InteractiveLightning from '@/components/ui/InteractiveLightning'
 
 export default function Hero() {
   return (
     <section className="py-12 lg:py-16 bg-black relative overflow-hidden">
+      {/* Interactive Lightning Background */}
+      <InteractiveLightning />
+
       {/* Hexagonal Honeycomb Background */}
       <div className="absolute inset-0 opacity-30">
         <svg className="w-full h-full" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
@@ -51,51 +55,51 @@ export default function Hero() {
       <div className="absolute bottom-1/3 -right-15 w-28 h-1 bg-yellow-400 opacity-25 transform -rotate-12"></div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           {/* Left column - Content */}
-          <div className="space-y-8">
+          <div className="space-y-6 lg:space-y-8 text-center lg:text-left">
             <div className="space-y-4">
-              <h1 className="text-4xl lg:text-6xl font-heading font-bold text-white leading-tight">
+              <h1 className="text-3xl sm:text-4xl lg:text-6xl font-heading font-bold text-white leading-tight">
                 Fast, reliable electronics repair{' '}
                 <span className="text-yellow-500">in Salem</span>
               </h1>
-              <p className="text-xl text-gray-300 leading-relaxed max-w-xl">
+              <p className="text-lg sm:text-xl text-gray-300 leading-relaxed max-w-xl mx-auto lg:mx-0">
                 Phones, computers, and consoles. Lifetime repair warranty. Same-day service
                 on most fixes.
               </p>
             </div>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start">
               <a
                 href="#quote-form"
-                className="bg-yellow-500 hover:bg-yellow-400 text-black px-8 py-4 rounded-xl font-semibold text-lg transition-all transform hover:scale-105 inline-flex items-center justify-center gap-2 shadow-lg"
+                className="bg-yellow-500 hover:bg-yellow-400 text-black px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold text-base sm:text-lg transition-all transform hover:scale-105 inline-flex items-center justify-center gap-2 shadow-lg"
               >
                 Get a Quote
-                <ArrowRight className="h-5 w-5" />
+                <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5" />
               </a>
               <a
                 href="tel:5034009920"
-                className="bg-yellow-500 hover:bg-yellow-400 text-black px-8 py-4 rounded-xl font-semibold text-lg transition-all transform hover:scale-105 inline-flex items-center justify-center gap-2 shadow-lg border-2 border-yellow-600"
+                className="bg-yellow-500 hover:bg-yellow-400 text-black px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold text-base sm:text-lg transition-all transform hover:scale-105 inline-flex items-center justify-center gap-2 shadow-lg border-2 border-yellow-600"
               >
-                <Phone className="h-5 w-5" />
+                <Phone className="h-4 w-4 sm:h-5 sm:w-5" />
                 Call Now
               </a>
             </div>
 
             {/* Trust badges */}
-            <div className="flex flex-wrap gap-4 pt-4">
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg px-4 py-2 flex items-center gap-2">
-                <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                <span className="text-gray-700 font-medium">Lifetime Warranty</span>
+            <div className="flex flex-wrap gap-2 sm:gap-4 pt-4 justify-center lg:justify-start">
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg px-3 sm:px-4 py-2 flex items-center gap-2">
+                <div className="w-2 h-2 sm:w-3 sm:h-3 bg-yellow-500 rounded-full"></div>
+                <span className="text-gray-700 font-medium text-sm sm:text-base">Lifetime Warranty</span>
               </div>
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg px-4 py-2 flex items-center gap-2">
-                <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                <span className="text-gray-700 font-medium">Same-Day Service</span>
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg px-3 sm:px-4 py-2 flex items-center gap-2">
+                <div className="w-2 h-2 sm:w-3 sm:h-3 bg-yellow-500 rounded-full"></div>
+                <span className="text-gray-700 font-medium text-sm sm:text-base">Same-Day Service</span>
               </div>
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg px-4 py-2 flex items-center gap-2">
-                <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                <span className="text-gray-700 font-medium">Local & Independent</span>
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg px-3 sm:px-4 py-2 flex items-center gap-2">
+                <div className="w-2 h-2 sm:w-3 sm:h-3 bg-yellow-500 rounded-full"></div>
+                <span className="text-gray-700 font-medium text-sm sm:text-base">Local & Independent</span>
               </div>
             </div>
           </div>
