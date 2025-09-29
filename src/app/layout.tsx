@@ -23,6 +23,27 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        {/* Performance Optimizations */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://maps.googleapis.com" />
+        <link rel="preconnect" href="https://www.myrepairapp.com" />
+        <link rel="dns-prefetch" href="https://maps.gstatic.com" />
+
+        {/* Viewport and Performance Meta Tags */}
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+        <meta name="theme-color" content="#eab308" />
+        <meta name="color-scheme" content="light" />
+
+        {/* Critical CSS and Resource Hints */}
+        <link rel="preload" href="/store-interior.jpg" as="image" type="image/jpeg" />
+
+        {/* Optimized Font Loading */}
+        <link
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet"
+        />
+
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

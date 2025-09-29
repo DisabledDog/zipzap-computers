@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { Phone, ArrowRight } from 'lucide-react'
 import InteractiveLightning from '@/components/ui/InteractiveLightning'
 
@@ -108,10 +109,14 @@ export default function Hero() {
           <div className="relative">
             {/* Store Photo */}
             <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-              <img
+              <Image
                 src="/store-interior.jpg"
                 alt="ZipZap Computers Store Interior - Professional electronics repair shop in Salem, Oregon"
+                width={800}
+                height={600}
+                priority={true}
                 className="w-full h-full object-cover aspect-[4/3]"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 40vw"
               />
 
               {/* Overlay for better text contrast */}

@@ -1,9 +1,11 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 
 export default function QuoteForm() {
   const [iframeHeight, setIframeHeight] = useState(600)
+  const [shouldLoadIframe, setShouldLoadIframe] = useState(false)
+  const sectionRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     // Adjust iframe height based on screen size
@@ -27,8 +29,29 @@ export default function QuoteForm() {
     return () => window.removeEventListener('resize', updateHeight)
   }, [])
 
+  useEffect(() => {
+    // Lazy load iframe when section comes into view
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setShouldLoadIframe(true)
+            observer.disconnect()
+          }
+        })
+      },
+      { rootMargin: '100px' }
+    )
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current)
+    }
+
+    return () => observer.disconnect()
+  }, [])
+
   return (
-    <section id="quote-form" className="py-12 lg:py-20 bg-white">
+    <section id="quote-form" className="py-12 lg:py-20 bg-white" ref={sectionRef}>
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center space-y-4 mb-8 lg:mb-12">
@@ -42,15 +65,28 @@ export default function QuoteForm() {
 
         {/* Quote Form Iframe */}
         <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden max-w-4xl mx-auto">
-          <iframe
-            id="quoteform"
-            src="https://www.myrepairapp.com/quoteform?api_key=zxXl-9OaBeUU7T6_IXF16&bg_color=undefined&text_color=undefined&disabled_categories=&hide_schedule_step=false&hide_create_quote=false&country=US"
-            style={{ border: 0, outline: 'none' }}
-            frameBorder="0"
-            width="100%"
-            height={iframeHeight}
-            title="Get Repair Quote"
-          />
+          {shouldLoadIframe ? (
+            <iframe
+              id="quoteform"
+              src="https://www.myrepairapp.com/quoteform?api_key=zxXl-9OaBeUU7T6_IXF16&bg_color=undefined&text_color=undefined&disabled_categories=&hide_schedule_step=false&hide_create_quote=false&country=US"
+              style={{ border: 0, outline: 'none' }}
+              frameBorder="0"
+              width="100%"
+              height={iframeHeight}
+              title="Get Repair Quote"
+              loading="lazy"
+            />
+          ) : (
+            <div
+              className="flex items-center justify-center bg-gray-50 text-gray-500"
+              style={{ height: iframeHeight }}
+            >
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-500 mx-auto mb-4"></div>
+                <p>Loading quote form...</p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </section>

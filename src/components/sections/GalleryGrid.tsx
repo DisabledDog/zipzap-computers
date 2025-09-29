@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 
 interface GalleryItem {
   id: string
@@ -248,10 +249,14 @@ export default function GalleryGrid() {
                 {/* Before Image */}
                 <div className="relative">
                   <div className="relative overflow-hidden rounded-xl shadow-lg">
-                    <img
+                    <Image
                       src={item.beforeImage}
                       alt={`${item.title} - Before`}
+                      width={400}
+                      height={256}
                       className="w-full h-64 object-cover"
+                      loading="lazy"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     />
                     <div className="absolute top-3 left-3 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
                       Before
@@ -262,10 +267,14 @@ export default function GalleryGrid() {
                 {/* After Image */}
                 <div className="relative">
                   <div className="relative overflow-hidden rounded-xl shadow-lg">
-                    <img
+                    <Image
                       src={item.afterImage}
                       alt={`${item.title} - After`}
+                      width={400}
+                      height={256}
                       className="w-full h-64 object-cover"
+                      loading="lazy"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     />
                     <div className="absolute top-3 left-3 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
                       After

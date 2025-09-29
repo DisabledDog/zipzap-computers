@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import { ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react'
 
 interface GalleryItem {
@@ -144,10 +145,14 @@ export default function BeforeAfterGallery() {
               {/* Image Display */}
               <div className="relative max-w-md mx-auto mb-6">
                 <div className="relative overflow-hidden rounded-xl shadow-2xl">
-                  <img
+                  <Image
                     src={isBeforeView ? currentItem.beforeImage : currentItem.afterImage}
                     alt={`${currentItem.title} - ${isBeforeView ? 'Before' : 'After'}`}
+                    width={600}
+                    height={320}
                     className="w-full h-80 object-cover transition-all duration-500"
+                    loading="lazy"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 60vw"
                   />
 
                   {/* Before/After Label */}
