@@ -68,7 +68,7 @@ export default function QuoteForm() {
           {shouldLoadIframe ? (
             <iframe
               id="quoteform"
-              src="https://www.myrepairapp.com/quoteform?api_key=zxXl-9OaBeUU7T6_IXF16&bg_color=%23000000&text_color=%23eeff00&disabled_categories=Wearables&hide_schedule_step=true&hide_create_quote=false&country=US"
+              src="https://www.myrepairapp.com/quoteform?api_key=zxXl-9OaBeUU7T6_IXF16&bg_color=%23ffffff&text_color=%23000000&disabled_categories=Wearables&hide_schedule_step=true&hide_create_quote=false&country=US"
               style={{ border: 0, outline: 'none' }}
               frameBorder="0"
               width="100%"
