@@ -27,7 +27,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://maps.googleapis.com" />
-        <link rel="preconnect" href="https://www.myrepairapp.com" />
+        <link rel="preconnect" href="https://www.clearsalehq.com" />
         <link rel="dns-prefetch" href="https://maps.gstatic.com" />
 
         {/* Viewport and Performance Meta Tags */}
