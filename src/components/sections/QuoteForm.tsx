@@ -1,22 +1,9 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
+import { useRef } from 'react'
 
 export default function QuoteForm() {
-  const [iframeHeight, setIframeHeight] = useState(700)
   const sectionRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const updateHeight = () => {
-      const screenHeight = window.innerHeight
-      const newHeight = Math.max(500, Math.min(900, screenHeight - 200))
-      setIframeHeight(newHeight)
-    }
-
-    updateHeight()
-    window.addEventListener('resize', updateHeight)
-    return () => window.removeEventListener('resize', updateHeight)
-  }, [])
 
   return (
     <section id="quote-form" className="py-12 lg:py-20 bg-white" ref={sectionRef}>
@@ -30,13 +17,13 @@ export default function QuoteForm() {
           </p>
         </div>
 
-        <div className="rounded-2xl shadow-lg border border-gray-200 overflow-hidden max-w-[600px] mx-auto">
+        <div className="rounded-2xl shadow-lg border border-gray-200 overflow-hidden max-w-2xl mx-auto">
           <iframe
             src="https://www.clearsalehq.com/quote-embed/61dd7752-552a-44bb-a47b-aa9e9387886e"
             width="100%"
-            height={iframeHeight}
+            height="900"
             frameBorder="0"
-            style={{ border: 'none', borderRadius: '12px' }}
+            style={{ border: 'none', minHeight: '80vh' }}
             title="Get Repair Quote"
           />
         </div>
