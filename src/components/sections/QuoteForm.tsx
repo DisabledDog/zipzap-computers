@@ -21,9 +21,9 @@ export default function QuoteForm() {
           <iframe
             src="https://www.clearsalehq.com/quote-embed/61dd7752-552a-44bb-a47b-aa9e9387886e"
             width="100%"
-            height="900"
+            height="650"
             frameBorder="0"
-            style={{ border: 'none', minHeight: '80vh' }}
+            style={{ border: 'none' }}
             title="Get Repair Quote"
           />
         </div>
