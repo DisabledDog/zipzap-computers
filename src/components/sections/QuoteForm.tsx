@@ -17,7 +17,7 @@ export default function QuoteForm() {
           </p>
         </div>
 
-        <div className="rounded-2xl shadow-lg border border-gray-200 overflow-hidden max-w-2xl mx-auto">
+        <div className="rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
           <iframe
             src="https://www.clearsalehq.com/quote-embed/61dd7752-552a-44bb-a47b-aa9e9387886e"
             width="100%"
