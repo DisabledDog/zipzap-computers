@@ -61,8 +61,7 @@ export async function POST(request: NextRequest) {
         read: false,
         link: '/quotes',
       })
-      .then(() => {})
-      .catch(() => {})
+      .then(() => {}, () => {})
 
     return NextResponse.json({ success: true, quote_id: data.id })
   } catch (error) {
