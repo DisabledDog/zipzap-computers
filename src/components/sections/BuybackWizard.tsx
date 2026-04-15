@@ -117,8 +117,14 @@ export default function BuybackWizard() {
     if (idx < 0 || idx === steps.length - 1) return
     const next = steps[idx + 1]
     setSubstep(next)
-    if (next === 'offer') fetchServerOffer()
   }
+
+  // Fetch on arrival at the offer step, after state has committed.
+  // Running this inside goNext read a stale `draft` and returned early.
+  useEffect(() => {
+    if (substep === 'offer') fetchServerOffer()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [substep])
   function goBack() {
     const idx = steps.indexOf(substep)
     if (idx <= 0) return
