@@ -58,8 +58,15 @@ export default function QuoteForm() {
             />
           </div>
         ) : (
-          <div className="rounded-2xl shadow-lg border border-gray-200 overflow-hidden bg-white p-5 sm:p-8">
-            <BuybackWizard />
+          <div className="rounded-2xl shadow-lg border border-gray-200 overflow-hidden bg-white">
+            <iframe
+              src="https://www.clearsalehq.com/buyback-embed/61dd7752-552a-44bb-a47b-aa9e9387886e"
+              width="100%"
+              height="700"
+              frameBorder="0"
+              style={{ border: 'none' }}
+              title="Sell your device"
+            />
           </div>
         )}
       </div>
