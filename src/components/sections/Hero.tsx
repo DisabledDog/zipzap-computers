@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { Phone, ArrowRight } from 'lucide-react'
+import { Phone, ArrowRight, DollarSign } from 'lucide-react'
 import InteractiveLightning from '@/components/ui/InteractiveLightning'
 
 export default function Hero() {
@@ -76,15 +76,22 @@ export default function Hero() {
                 href="#quote-form"
                 className="bg-yellow-500 hover:bg-yellow-400 text-black px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold text-base sm:text-lg transition-all transform hover:scale-105 inline-flex items-center justify-center gap-2 shadow-lg"
               >
-                Get a Quote
+                Repair Quote
                 <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5" />
               </a>
+              <Link
+                href="/sell"
+                className="bg-black hover:bg-gray-900 text-yellow-400 px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold text-base sm:text-lg transition-all transform hover:scale-105 inline-flex items-center justify-center gap-2 shadow-lg border-2 border-yellow-500"
+              >
+                <DollarSign className="h-4 w-4 sm:h-5 sm:w-5" />
+                Sell Your Device
+              </Link>
               <a
                 href="tel:5034009920"
                 className="bg-yellow-500 hover:bg-yellow-400 text-black px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold text-base sm:text-lg transition-all transform hover:scale-105 inline-flex items-center justify-center gap-2 shadow-lg border-2 border-yellow-600"
               >
                 <Phone className="h-4 w-4 sm:h-5 sm:w-5" />
-                Call Now
+                Call
               </a>
             </div>
 
