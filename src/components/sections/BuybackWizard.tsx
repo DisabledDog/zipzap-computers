@@ -10,6 +10,11 @@ import {
 
 /* ========= Config ========= */
 
+// Static export can't run API routes, so the wizard talks to the POS directly.
+// Override per environment via NEXT_PUBLIC_POS_URL and NEXT_PUBLIC_SHOP_USER_ID.
+const POS_URL = process.env.NEXT_PUBLIC_POS_URL || 'https://www.clearsalehq.com'
+const SHOP_USER_ID = process.env.NEXT_PUBLIC_SHOP_USER_ID || '61dd7752-552a-44bb-a47b-aa9e9387886e'
+
 type Substep =
   | 'category' | 'brand' | 'model' | 'storage' | 'carrier'
   | 'condition'
@@ -77,7 +82,7 @@ export default function BuybackWizard() {
   const [result, setResult] = useState<any>(null)
 
   useEffect(() => {
-    fetch('/api/buyback').then((r) => r.json()).then((d) => {
+    fetch(`${POS_URL}/api/public/buyback?shop=${SHOP_USER_ID}`).then((r) => r.json()).then((d) => {
       if (d.success) setSettings(d)
     }).catch(() => setSettings({
       enabled: true,
@@ -86,7 +91,7 @@ export default function BuybackWizard() {
       store_credit_bonus_percent: 10,
       damage_deductions: [],
     }))
-    fetch('/api/buyback/catalog').then((r) => r.json()).then((d) => {
+    fetch(`${POS_URL}/api/public/buyback/catalog`).then((r) => r.json()).then((d) => {
       if (d.success) setCatalog(d.catalog || [])
     }).catch(() => {})
   }, [])
@@ -124,9 +129,10 @@ export default function BuybackWizard() {
     if (!draft.category || !draft.condition_grade) return
     setLoadingOffer(true)
     try {
-      const res = await fetch('/api/buyback', {
+      const res = await fetch(`${POS_URL}/api/public/buyback?shop=${SHOP_USER_ID}`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          shop_user_id: SHOP_USER_ID,
           preview: true,
           device_category: draft.category,
           device_brand: draft.brand,
@@ -145,9 +151,10 @@ export default function BuybackWizard() {
     setSubmitting(true)
     const looksLikeEmail = draft.contact.includes('@')
     try {
-      const res = await fetch('/api/buyback', {
+      const res = await fetch(`${POS_URL}/api/public/buyback?shop=${SHOP_USER_ID}`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          shop_user_id: SHOP_USER_ID,
           device_category: draft.category,
           device_brand: draft.brand,
           device_model: draft.model,
