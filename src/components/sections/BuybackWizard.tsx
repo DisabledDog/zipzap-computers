@@ -308,40 +308,23 @@ export default function BuybackWizard() {
 
         {substep === 'contact' && (
           <Screen heading="Where should we send your offer?" subheading={serverOffer?.auto_reject?.rejected ? "We'll call to arrange a look in person." : "We'll text or email to confirm."}>
+            {/* iCloud / passcode — phones only, shown above the form */}
+            {draft.category === 'Phone' && (
+              <div className="px-4 py-3 rounded-xl bg-rose-50 border border-rose-200 flex items-start gap-2">
+                <AlertTriangle className="h-4 w-4 text-rose-600 flex-shrink-0 mt-0.5" />
+                <div className="text-[13px] text-rose-900 leading-snug">
+                  <strong>Heads up:</strong> we don&apos;t purchase phones that are <strong>iCloud locked</strong> or <strong>passcode locked</strong>.
+                  Please bring it <strong>reset</strong> with <strong>Find My iPhone removed</strong>.
+                </div>
+              </div>
+            )}
+
             <ContactForm
               draft={draft}
               setDraft={setDraft}
               submitting={submitting}
               onSubmit={submit}
             />
-
-            {/* Before-you-submit notices */}
-            <div className="space-y-2 pt-2">
-              {/* Backglass — only when Heavy Wear was picked AND a matching deduction exists */}
-              {draft.condition_id === 'rough' && draft.brand && draft.model && (() => {
-                const ded = findDeduction(settings?.damage_deductions || [], 'cracked_back', draft.brand, draft.model)
-                if (!ded) return null
-                return (
-                  <div className="px-4 py-3 rounded-xl bg-amber-50 border border-amber-200 flex items-start gap-2">
-                    <AlertTriangle className="h-4 w-4 text-amber-600 flex-shrink-0 mt-0.5" />
-                    <div className="text-[13px] text-amber-900 leading-snug">
-                      An extra deduction may apply if the back glass is shattered or cracked.
-                    </div>
-                  </div>
-                )
-              })()}
-
-              {/* iCloud / passcode — phones only */}
-              {draft.category === 'Phone' && (
-                <div className="px-4 py-3 rounded-xl bg-rose-50 border border-rose-200 flex items-start gap-2">
-                  <AlertTriangle className="h-4 w-4 text-rose-600 flex-shrink-0 mt-0.5" />
-                  <div className="text-[13px] text-rose-900 leading-snug">
-                    <strong>Heads up:</strong> we don&apos;t purchase phones that are <strong>iCloud locked</strong> or <strong>passcode locked</strong>.
-                    Please bring it <strong>reset</strong> with <strong>Find My iPhone removed</strong>.
-                  </div>
-                </div>
-              )}
-            </div>
           </Screen>
         )}
 
@@ -827,17 +810,6 @@ function OfferScreen({ loading, offer, smartSource, onAccept }: {
           in cash, or <span className="font-semibold text-gray-900">{formatCents(creditCents)} store credit</span>
         </div>
       </div>
-      <details className="text-xs text-gray-500 group">
-        <summary className="cursor-pointer text-center hover:text-gray-900 font-medium">How we got this number</summary>
-        <div className="mt-3 space-y-1 bg-gray-50 rounded-xl p-4">
-          {(offer.breakdown_lines || []).map((line: any, i: number) => (
-            <div key={i} className="flex items-center justify-between text-sm">
-              <span>{line.label}</span>
-              <span className="font-semibold text-gray-900">{line.amount_cents >= 0 ? '+' : ''}{formatCents(line.amount_cents)}</span>
-            </div>
-          ))}
-        </div>
-      </details>
       <button onClick={onAccept} className="w-full bg-gray-900 hover:bg-black text-white font-semibold py-4 rounded-2xl transition-colors inline-flex items-center justify-center gap-2 text-base">
         Lock in my offer <ArrowRight className="h-4 w-4" />
       </button>
@@ -906,7 +878,7 @@ function DoneScreen({ result, expirationDays }: { result: any; expirationDays: n
           <p className="text-sm text-gray-500">or {formatCents(result.store_credit_offer_cents)} store credit</p>
           <div className="max-w-md mx-auto text-sm text-gray-600 space-y-2 pt-4 text-left">
             <div className="flex items-start gap-2"><Clock className="h-4 w-4 text-gray-400 flex-shrink-0 mt-0.5" /><span>Good for <strong className="text-gray-900">{expirationDays} days</strong></span></div>
-            <div className="flex items-start gap-2"><MapPin className="h-4 w-4 text-gray-400 flex-shrink-0 mt-0.5" /><span>Bring to our Salem or Brooks shop</span></div>
+            <div className="flex items-start gap-2"><MapPin className="h-4 w-4 text-gray-400 flex-shrink-0 mt-0.5" /><span>Bring it to the shop</span></div>
             <div className="flex items-start gap-2"><ShieldCheck className="h-4 w-4 text-gray-400 flex-shrink-0 mt-0.5" /><span>Photo ID required</span></div>
           </div>
           <div className="max-w-md mx-auto mt-2 px-4 py-3 rounded-xl bg-rose-50 border border-rose-200 text-left">
