@@ -122,7 +122,7 @@ export default function Hero() {
                   ))}
                 </div>
                 <span className="text-sm text-gray-300">
-                  <span className="font-bold text-white">{rating ? rating.toFixed(1) : '4.9'}</span>
+                  <span className="font-bold text-white">{rating ? rating.toFixed(1) : '4.7'}</span>
                   {reviewCount ? ` · ${reviewCount}+ Google reviews` : ' on Google'}
                 </span>
               </div>

@@ -45,7 +45,7 @@ export default function QuoteForm() {
               <ShieldCheck className="h-4 w-4 text-yellow-500" /> Free &amp; no obligation
             </span>
             <span className="inline-flex items-center gap-1.5">
-              <Star className="h-4 w-4 fill-yellow-500 text-yellow-500" /> Rated 4.9 by locals
+              <Star className="h-4 w-4 fill-yellow-500 text-yellow-500" /> Rated 4.7 by locals
             </span>
           </div>
         </Reveal>

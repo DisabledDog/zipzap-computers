@@ -44,7 +44,7 @@ export default function CustomGoogleWidget() {
   }
 
   // Fallbacks so the section never renders empty (e.g. API key missing locally).
-  const ratingDisplay = businessRating ?? 4.9
+  const ratingDisplay = businessRating ?? 4.7
   const totalDisplay = totalReviews ?? 226
 
   return (

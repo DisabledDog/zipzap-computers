@@ -169,36 +169,44 @@ export default function AdminPanel() {
   const compressExistingPhotos = async () => {
     if (!confirm('Shrink all oversized inventory photos already saved? This keeps each photo, just smaller. Safe to run.')) return
     setIsFixingPhotos(true)
-    setFixPhotosMsg('Reading items directly from the database…')
+    setFixPhotosMsg('Finding items…')
     try {
-      // Direct Supabase read — bypasses the API size limit that's breaking the store.
-      const { data, error } = await supabase.from('inventory').select('id, title, image_url')
-      if (error) throw error
-      const big = (data || []).filter(
-        (it: any) => typeof it.image_url === 'string' && it.image_url.startsWith('data:image') && it.image_url.length > 120000
-      )
-      if (big.length === 0) {
-        setFixPhotosMsg('All photos are already small — nothing to do. ✅')
+      // Step 1: get just the ids/titles (tiny payload — never times out).
+      const { data: rows, error: idErr } = await supabase.from('inventory').select('id, title')
+      if (idErr) throw idErr
+      const list = rows || []
+      if (list.length === 0) {
+        setFixPhotosMsg('No items are readable from the database. Check Supabase keys / row security.')
         setIsFixingPhotos(false)
         return
       }
-      let done = 0
-      for (const it of big) {
-        setFixPhotosMsg(`Compressing ${done + 1} of ${big.length}: ${it.title || 'item'}…`)
-        const before = it.image_url.length
-        const smaller = await recompressDataUrl(it.image_url, 640, 0.5)
-        // Only write if it actually got smaller
-        const payload = smaller.length < before ? smaller : it.image_url
-        const res = await fetch('/api/inventory', {
-          method: 'PUT',
-          headers: getAuthHeaders(),
-          body: JSON.stringify({ id: it.id, image_url: payload }),
-        })
-        const r = await res.json()
-        if (!r.success) throw new Error(r.error || 'update failed')
-        done++
+      // Step 2: pull each photo ONE AT A TIME, recompress, and save it back.
+      let checked = 0
+      let fixed = 0
+      for (const row of list as any[]) {
+        checked++
+        setFixPhotosMsg(`Checking ${checked} of ${list.length}…`)
+        const { data: one, error: oneErr } = await supabase
+          .from('inventory')
+          .select('image_url')
+          .eq('id', row.id)
+          .single()
+        if (oneErr || !one) continue
+        const img = (one as any).image_url
+        if (typeof img === 'string' && img.startsWith('data:image') && img.length > 120000) {
+          const smaller = await recompressDataUrl(img, 640, 0.5)
+          if (smaller.length < img.length) {
+            const res = await fetch('/api/inventory', {
+              method: 'PUT',
+              headers: getAuthHeaders(),
+              body: JSON.stringify({ id: row.id, image_url: smaller }),
+            })
+            const r = await res.json()
+            if (r.success) fixed++
+          }
+        }
       }
-      setFixPhotosMsg(`Done — compressed ${done} photo(s). Your store should load again now. ✅`)
+      setFixPhotosMsg(`Done — checked ${checked} item(s), compressed ${fixed} photo(s). Refresh your store. ✅`)
       await loadInventory()
     } catch (e: any) {
       setFixPhotosMsg('Error: ' + (e?.message || String(e)))

@@ -21,7 +21,7 @@ export async function GET() {
     ]
 
     let allReviews: any[] = []
-    let rating = 4.9
+    let rating = 4.7
     let totalReviews = 226
 
     for (const url of urls) {

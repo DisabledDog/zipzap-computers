@@ -95,7 +95,7 @@ export default function WhyUs() {
               </div>
               <div className="rounded-xl border border-gray-800 bg-gray-900 p-6 transition-colors hover:border-yellow-500">
                 <div className="font-heading text-4xl font-bold tabular-nums text-yellow-500 lg:text-5xl">
-                  {rating !== null ? rating.toFixed(1) : '4.9'}★
+                  {rating !== null ? rating.toFixed(1) : '4.7'}★
                 </div>
                 <div className="mt-2 font-medium text-gray-300">
                   {reviewCount !== null ? `Average Rating · ${reviewCount} reviews` : 'Average Rating'}
