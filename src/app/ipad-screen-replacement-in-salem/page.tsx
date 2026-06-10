@@ -24,6 +24,7 @@ export default function iPadScreenReplacementSalem() {
 }
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/ipad-screen-replacement-in-salem' },
   title: 'iPad Screen Replacement in Salem, Oregon | ZipZap Computers',
   description: 'Professional iPad screen replacement service in Salem, Oregon. Expert repair for iPad Pro, iPad Air, iPad mini with high-quality displays and lifetime warranty.',
   keywords: 'iPad screen replacement Salem Oregon, iPad display repair Salem, iPad Pro screen Salem, iPad Air screen Salem, iPad mini screen Salem, tablet screen repair Salem',

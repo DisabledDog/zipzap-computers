@@ -14,6 +14,7 @@ export default function XboxRepairSalem() {
 }
 
 export const metadata = {
+  alternates: { canonical: '/xbox-repair-services-in-salem' },
   title: 'Xbox Repair Services in Salem, Oregon | ZipZap Computers',
   description: 'Professional Xbox console repair in Salem, Oregon. Xbox Series X/S, Xbox One, Xbox 360 repair. Red ring of death, disc drive, HDMI port repair.',
   keywords: 'Xbox repair Salem Oregon, Xbox Series X repair Salem, Xbox One repair Salem, Xbox 360 red ring repair Salem, Xbox HDMI repair Salem',

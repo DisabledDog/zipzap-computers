@@ -25,8 +25,39 @@ export default function ServicePageTemplate({
   const capitalizedLocation = location.charAt(0).toUpperCase() + location.slice(1)
   const subServices = getSubServiceLinks(title, location)
 
+  // Per-page Service schema linked to the LocalBusiness declared in root layout.
+  // Helps Google associate this specific service offering with the shop entity.
+  const serviceSchema = {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "serviceType": title,
+    "description": description,
+    "provider": {
+      "@type": "ElectronicsStore",
+      "name": "ZipZap Computers",
+      "url": "https://zipzapcomputers.com",
+      "telephone": "+1-503-400-9920",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "3945 Rich Dr NE B",
+        "addressLocality": "Salem",
+        "addressRegion": "OR",
+        "postalCode": "97305",
+        "addressCountry": "US"
+      }
+    },
+    "areaServed": {
+      "@type": "City",
+      "name": `${capitalizedLocation}, Oregon`
+    }
+  }
+
   return (
     <div className="min-h-screen bg-white">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }}
+      />
       {/* Hero Section */}
       <section className="py-20 bg-black relative overflow-hidden">
         {/* Background Pattern */}
@@ -204,6 +235,40 @@ export default function ServicePageTemplate({
         </div>
       </section>
 
+      {/* Service Area */}
+      <section className="py-16 bg-gray-50 border-t border-gray-100">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-2xl lg:text-3xl font-heading font-bold text-black mb-3">
+            Serving the Mid-Willamette Valley
+          </h2>
+          <p className="text-gray-600 max-w-2xl mx-auto mb-6">
+            Our {capitalizedLocation} shop services customers from across the region.
+            Easy access from I-5 with same-day repairs on most devices.
+          </p>
+          <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm font-medium text-gray-700">
+            <span>Salem</span>
+            <span className="text-gray-300">·</span>
+            <span>Keizer</span>
+            <span className="text-gray-300">·</span>
+            <span>Silverton</span>
+            <span className="text-gray-300">·</span>
+            <span>Woodburn</span>
+            <span className="text-gray-300">·</span>
+            <span>Dallas</span>
+            <span className="text-gray-300">·</span>
+            <span>Monmouth</span>
+            <span className="text-gray-300">·</span>
+            <span>Independence</span>
+            <span className="text-gray-300">·</span>
+            <span>Stayton</span>
+            <span className="text-gray-300">·</span>
+            <span>Albany</span>
+            <span className="text-gray-300">·</span>
+            <span>Turner</span>
+          </div>
+        </div>
+      </section>
+
       {/* Contact CTA */}
       <section className="py-20 bg-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -221,7 +286,7 @@ export default function ServicePageTemplate({
               Call Now: (503) 400-9920
             </a>
             <a
-              href="https://maps.google.com/?q=ZipZap+Computers+{location}+Oregon"
+              href={`https://maps.google.com/?q=ZipZap+Computers+${location}+Oregon`}
               className="border-2 border-yellow-500 text-yellow-500 hover:bg-yellow-500 hover:text-black px-8 py-4 rounded-xl font-semibold text-lg transition-all inline-flex items-center justify-center gap-2"
               target="_blank"
               rel="noopener noreferrer"

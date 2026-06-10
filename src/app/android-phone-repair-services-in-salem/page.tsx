@@ -14,6 +14,7 @@ export default function AndroidPhoneRepairSalem() {
 }
 
 export const metadata = {
+  alternates: { canonical: '/android-phone-repair-services-in-salem' },
   title: 'Android Phone Repair Services in Salem, Oregon | ZipZap Computers',
   description: 'Expert Android phone repair in Salem, Oregon. Samsung Galaxy, Google Pixel, OnePlus, LG repair. Screen replacement, battery service, software repair.',
   keywords: 'Android phone repair Salem Oregon, Samsung Galaxy repair Salem, Google Pixel repair Salem, OnePlus repair Salem, Android screen replacement Salem',

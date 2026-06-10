@@ -2,9 +2,10 @@ import { Metadata } from 'next'
 import { Wrench, Shield, Clock, DollarSign, CheckCircle, Phone, MapPin, Star } from 'lucide-react'
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/electronics-gadgets-repair-problem-oregon' },
   title: 'Electronics & Gadgets Repair Solutions in Oregon | ZipZap Computers',
   description: 'Professional electronics and gadget repair services throughout Oregon. Expert technicians fix phones, computers, tablets, gaming consoles, and more with lifetime warranty.',
-  keywords: 'electronics repair Oregon, gadget repair Oregon, device repair Salem, tech repair Brooks, Oregon electronics service'
+  keywords: 'electronics repair Oregon, gadget repair Oregon, device repair Salem, Oregon electronics service'
 }
 
 export default function ElectronicsGadgetsRepairOregon() {
@@ -36,7 +37,7 @@ export default function ElectronicsGadgetsRepairOregon() {
             </h1>
             <p className="text-xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
               From smartphones to gaming consoles, we solve all your electronics repair problems with professional service,
-              lifetime warranty, and same-day solutions. Serving Salem, Brooks, and surrounding Oregon communities.
+              lifetime warranty, and same-day solutions. Serving Salem and surrounding Oregon communities.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
               <a
@@ -129,7 +130,7 @@ export default function ElectronicsGadgetsRepairOregon() {
               Why Oregon Chooses ZipZap Computers
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Trusted by thousands of customers across Salem, Brooks, and surrounding communities
+              Trusted by thousands of customers across Salem and surrounding communities
             </p>
           </div>
 
@@ -206,32 +207,19 @@ export default function ElectronicsGadgetsRepairOregon() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="bg-gray-50 rounded-2xl p-8">
-              <div className="flex items-center gap-3 mb-4">
+          <div className="max-w-2xl mx-auto">
+            <div className="bg-gray-50 rounded-2xl p-8 text-center">
+              <div className="inline-flex items-center gap-3 mb-4">
                 <MapPin className="h-6 w-6 text-yellow-500" />
                 <h3 className="text-2xl font-semibold text-black">Salem Location</h3>
               </div>
               <p className="text-gray-600 mb-4">
-                Our main service center in Salem provides comprehensive electronics repair for Marion County
-                and surrounding areas. Easy access from I-5 and downtown Salem.
+                Our service center at 3945 Rich Dr NE Ste B in Salem serves the entire
+                Mid-Willamette Valley. Easy access from I-5 and downtown Salem, with same-day
+                repairs on most devices.
               </p>
               <a href="/services" className="text-yellow-500 hover:text-yellow-600 font-semibold">
-                View Salem Services →
-              </a>
-            </div>
-
-            <div className="bg-gray-50 rounded-2xl p-8">
-              <div className="flex items-center gap-3 mb-4">
-                <MapPin className="h-6 w-6 text-yellow-500" />
-                <h3 className="text-2xl font-semibold text-black">Brooks Location</h3>
-              </div>
-              <p className="text-gray-600 mb-4">
-                Serving Brooks, Gervais, and North Marion County with full electronics repair services.
-                Convenient location for rural communities.
-              </p>
-              <a href="/device-repair-brooks-or" className="text-yellow-500 hover:text-yellow-600 font-semibold">
-                View Brooks Services →
+                View All Services →
               </a>
             </div>
           </div>

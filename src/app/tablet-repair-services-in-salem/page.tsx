@@ -14,6 +14,7 @@ export default function TabletRepairSalem() {
 }
 
 export const metadata = {
+  alternates: { canonical: '/tablet-repair-services-in-salem' },
   title: 'Tablet Repair Services in Salem, Oregon | ZipZap Computers',
   description: 'Expert tablet repair services in Salem, Oregon. iPad screen replacement, Samsung Galaxy Tab repair, battery service, and charging port repair. Lifetime warranty.',
   keywords: 'tablet repair Salem Oregon, iPad repair Salem, Samsung tablet repair Salem, tablet screen replacement Salem',

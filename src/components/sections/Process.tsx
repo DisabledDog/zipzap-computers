@@ -96,7 +96,7 @@ export default function Process() {
                 Call (503) 400-9920
               </a>
               <a
-                href="/contact"
+                href="/#quote-form"
                 className="bg-white border-2 border-black text-black hover:bg-gray-100 px-8 py-4 rounded-xl font-semibold text-lg transition-colors shadow-lg"
               >
                 Book Online

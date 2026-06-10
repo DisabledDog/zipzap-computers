@@ -14,6 +14,7 @@ export default function MacBookRepairSalem() {
 }
 
 export const metadata = {
+  alternates: { canonical: '/macbook-repair-services-in-salem' },
   title: 'MacBook Repair Services in Salem, Oregon | ZipZap Computers',
   description: 'Professional MacBook repair in Salem, Oregon. MacBook Air and Pro screen replacement, battery service, logic board repair, keyboard replacement.',
   keywords: 'MacBook repair Salem Oregon, MacBook screen replacement Salem, MacBook battery replacement Salem, MacBook logic board repair Salem',

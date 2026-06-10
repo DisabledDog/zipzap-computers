@@ -278,8 +278,24 @@ export const individualServiceData = {
   }
 }
 
+// Sub-service slugs that have an actual page on disk (src/app/<slug>-in-salem/page.tsx).
+// Mirrors the list in subServiceLinks.ts. Used to filter related-service links so
+// the Salem sub-service pages don't render dead "Related Services" cards.
+const EXISTING_SUB_SERVICE_SLUGS = new Set<string>([
+  '/iphone-screen-replacement',
+  '/iphone-battery-replacement',
+  '/iphone-water-damage-repair',
+  '/iphone-camera-repair',
+  '/macbook-screen-replacement',
+  '/macbook-battery-replacement',
+  '/ipad-screen-replacement',
+  '/playstation-repair',
+])
+
 export function getRelatedServices(deviceType: string, location: string, currentService: string) {
-  const locationSuffix = location === 'salem' ? '-in-salem' : '-brooks'
+  // Brooks pages were removed — Salem is the only supported location.
+  const locationSuffix = '-in-salem'
+  void location
 
   const serviceMap: { [key: string]: { name: string; url: string }[] } = {
     'iPhone': [
@@ -316,7 +332,9 @@ export function getRelatedServices(deviceType: string, location: string, current
     ]
   }
 
-  return (serviceMap[deviceType] || []).filter(service =>
-    !service.url.includes(currentService.replace(/-(in-salem|brooks)$/, ''))
-  )
+  const currentBase = currentService.replace(/-(in-salem|brooks)$/, '')
+  return (serviceMap[deviceType] || []).filter(service => {
+    const slug = service.url.replace(locationSuffix, '')
+    return EXISTING_SUB_SERVICE_SLUGS.has(slug) && !service.url.includes(currentBase)
+  })
 }

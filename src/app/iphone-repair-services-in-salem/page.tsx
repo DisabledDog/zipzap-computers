@@ -14,6 +14,7 @@ export default function iPhoneRepairSalem() {
 }
 
 export const metadata = {
+  alternates: { canonical: '/iphone-repair-services-in-salem' },
   title: 'iPhone Repair Services in Salem, Oregon | ZipZap Computers',
   description: 'Professional iPhone repair services in Salem, Oregon. Screen replacement, battery service, water damage repair, and more. Lifetime warranty on all repairs.',
   keywords: 'iPhone repair Salem Oregon, iPhone screen replacement Salem, iPhone battery replacement Salem, iPhone water damage repair Salem',

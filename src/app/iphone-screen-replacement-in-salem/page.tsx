@@ -24,6 +24,7 @@ export default function iPhoneScreenReplacementSalem() {
 }
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/iphone-screen-replacement-in-salem' },
   title: 'iPhone Screen Replacement in Salem, Oregon | ZipZap Computers',
   description: 'Professional iPhone screen replacement service in Salem, Oregon. Same-day service available with lifetime warranty. We repair all iPhone models from iPhone 6 to iPhone 15 Pro Max.',
   keywords: 'iPhone screen replacement Salem Oregon, iPhone screen repair Salem, cracked iPhone screen Salem, iPhone display repair Salem, iPhone LCD replacement Salem',

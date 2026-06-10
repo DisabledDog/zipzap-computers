@@ -14,6 +14,7 @@ export default function CellPhoneRepairSalem() {
 }
 
 export const metadata = {
+  alternates: { canonical: '/cell-phone-repair-services-in-salem' },
   title: 'Cell Phone Repair Services in Salem, Oregon | ZipZap Computers',
   description: 'Professional cell phone repair in Salem, Oregon. iPhone, Samsung, Google Pixel repair. Screen replacement, battery service, water damage repair.',
   keywords: 'cell phone repair Salem Oregon, phone screen replacement Salem, phone battery replacement Salem, phone water damage repair Salem',

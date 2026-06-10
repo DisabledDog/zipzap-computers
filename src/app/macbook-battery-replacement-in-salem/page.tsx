@@ -24,6 +24,7 @@ export default function MacBookBatteryReplacementSalem() {
 }
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/macbook-battery-replacement-in-salem' },
   title: 'MacBook Battery Replacement in Salem, Oregon | ZipZap Computers',
   description: 'Professional MacBook battery replacement service in Salem, Oregon. Fix swollen batteries, poor battery life, and charging issues for MacBook Air and MacBook Pro with lifetime warranty.',
   keywords: 'MacBook battery replacement Salem Oregon, MacBook swollen battery Salem, MacBook battery repair Salem, MacBook Air battery Salem, MacBook Pro battery Salem, laptop battery replacement Salem',

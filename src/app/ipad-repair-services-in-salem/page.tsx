@@ -14,6 +14,7 @@ export default function iPadRepairSalem() {
 }
 
 export const metadata = {
+  alternates: { canonical: '/ipad-repair-services-in-salem' },
   title: 'iPad Repair Services in Salem, Oregon | ZipZap Computers',
   description: 'Professional iPad repair in Salem, Oregon. iPad Pro, iPad Air, iPad mini screen replacement, battery service, charging port repair. Lifetime warranty.',
   keywords: 'iPad repair Salem Oregon, iPad screen replacement Salem, iPad Pro repair Salem, iPad Air repair Salem, iPad mini repair Salem, iPad battery replacement Salem',

@@ -24,6 +24,7 @@ export default function MacBookScreenReplacementSalem() {
 }
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/macbook-screen-replacement-in-salem' },
   title: 'MacBook Screen Replacement in Salem, Oregon | ZipZap Computers',
   description: 'Professional MacBook screen replacement service in Salem, Oregon. Expert repair for MacBook Air and MacBook Pro Retina displays with lifetime warranty and same-day service.',
   keywords: 'MacBook screen replacement Salem Oregon, MacBook display repair Salem, MacBook Retina screen Salem, MacBook Air screen Salem, MacBook Pro screen Salem, laptop screen repair Salem',

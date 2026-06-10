@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import { ArrowRight, ArrowLeft, Check, Smartphone, Monitor, Tablet, Gamepad2, AlertTriangle, Phone, Search, Zap, Clock, ShieldCheck, MapPin, HelpCircle, X } from 'lucide-react'
+import { ArrowRight, ArrowLeft, Check, Smartphone, Monitor, Tablet, Gamepad2, AlertTriangle, Phone, Search, Zap, Clock, ShieldCheck, MapPin, HelpCircle, X, Wrench } from 'lucide-react'
 import {
   DEFAULT_SETTINGS,
   type BuybackSettings, type ConditionGrade, type CarrierStatus, type DamageDeduction,
@@ -21,11 +21,24 @@ type Substep =
   | 'offer' | 'contact'
   | 'done'
 
-const CATEGORIES = [
-  { id: 'Phone',   label: 'Phone',   icon: Smartphone },
-  { id: 'Tablet',  label: 'Tablet',  icon: Tablet },
-  { id: 'Laptop',  label: 'Laptop',  icon: Monitor },
-  { id: 'Console', label: 'Console', icon: Gamepad2 },
+// First-screen tiles. These mirror the Repair quote widget so customers see the
+// same starting question regardless of which flow they entered.
+// `brand` is pre-filled when the tile already implies it (iPhone → Apple, etc.)
+// so we can skip the Brand step. Gaming Console + Other still ask for brand.
+type CategoryTile = {
+  id: 'iPhone' | 'Samsung' | 'iPad' | 'MacBook' | 'Gaming Console' | 'Other'
+  label: string
+  icon: React.ElementType
+  category: 'Phone' | 'Tablet' | 'Laptop' | 'Console' | ''
+  brand: string  // empty = ask user
+}
+const CATEGORIES: readonly CategoryTile[] = [
+  { id: 'iPhone',         label: 'iPhone',         icon: Smartphone, category: 'Phone',   brand: 'Apple' },
+  { id: 'Samsung',        label: 'Samsung',        icon: Smartphone, category: 'Phone',   brand: 'Samsung' },
+  { id: 'iPad',           label: 'iPad',           icon: Tablet,     category: 'Tablet',  brand: 'Apple' },
+  { id: 'MacBook',        label: 'MacBook',        icon: Monitor,    category: 'Laptop',  brand: 'Apple' },
+  { id: 'Gaming Console', label: 'Gaming Console', icon: Gamepad2,   category: 'Console', brand: '' },
+  { id: 'Other',          label: 'Other',          icon: Wrench,     category: '',        brand: '' },
 ] as const
 
 const BRANDS: Record<string, string[]> = {
@@ -100,14 +113,18 @@ export default function BuybackWizard() {
   const atlasModels = catalog.find((b) => b.brand === 'Apple')?.models || []
   const selectedAtlasModel = atlasModels.find((m) => m.name === draft.model)
 
-  // Progress step count
+  // Progress step count.
+  // Skip 'brand' when the category-tile already implies the brand
+  // (iPhone → Apple, Samsung → Samsung, iPad/MacBook → Apple).
   const steps: Substep[] = useMemo(() => {
-    const arr: Substep[] = ['category', 'brand', 'model']
+    const arr: Substep[] = ['category']
+    if (!draft.brand) arr.push('brand')
+    arr.push('model')
     if (useAtlas || draft.category === 'Phone') arr.push('storage')
     if (draft.category === 'Phone') arr.push('carrier')
     arr.push('condition', 'offer', 'contact')
     return arr
-  }, [draft.category, useAtlas])
+  }, [draft.category, draft.brand, useAtlas])
 
   const stepIndex = steps.indexOf(substep)
   const progressPct = stepIndex >= 0 ? ((stepIndex + 1) / steps.length) * 100 : 100
@@ -194,35 +211,44 @@ export default function BuybackWizard() {
     <div className="max-w-2xl mx-auto">
       {/* Progress + back */}
       {substep !== 'done' && (
-        <div className="flex items-center gap-3 mb-10">
+        <div className="flex items-center gap-3 mb-8">
           {stepIndex > 0 ? (
-            <button onClick={goBack} className="flex items-center justify-center h-9 w-9 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors" aria-label="Back">
-              <ArrowLeft className="h-4 w-4" />
+            <button onClick={goBack} className="flex items-center justify-center h-9 w-9 rounded-full bg-gray-100/80 hover:bg-gray-200/80 text-gray-700 transition-colors" aria-label="Back">
+              <ArrowLeft className="h-4 w-4" strokeWidth={2} />
             </button>
           ) : <div className="w-9" />}
-          <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-            <div className="h-full bg-gradient-to-r from-yellow-400 to-yellow-500 transition-all duration-500 rounded-full" style={{ width: `${progressPct}%` }} />
+          <div className="flex-1 h-[3px] bg-gray-100 rounded-full overflow-hidden">
+            <div className="h-full bg-gray-900 transition-all duration-500 rounded-full" style={{ width: `${progressPct}%` }} />
           </div>
-          <div className="text-xs font-bold text-gray-400 min-w-[40px] text-right tabular-nums">{stepIndex + 1}/{steps.length}</div>
+          <div className="text-[11px] font-medium text-gray-400 min-w-[36px] text-right tabular-nums tracking-wide">{stepIndex + 1} / {steps.length}</div>
         </div>
       )}
 
       <div className="min-h-[400px]">
         {substep === 'category' && (
           <Screen heading="What are you selling?">
-            <Grid cols={2}>
+            <Grid cols={3}>
               {CATEGORIES.map((c) => {
                 const Icon = c.icon
-                const ok = (settings?.accepted_categories || CATEGORIES.map((x) => x.id)).includes(c.id as any)
+                // Shop's `accepted_categories` are broad buckets (Phone/Tablet/Laptop/Console).
+                // Tiles with no underlying category (Other) are always allowed.
+                const accepted = settings?.accepted_categories || ['Phone', 'Tablet', 'Laptop', 'Console']
+                const ok = !c.category || accepted.includes(c.category as any)
                 return (
                   <Tile
                     key={c.id}
                     disabled={!ok}
-                    onClick={() => { setDraft({ ...EMPTY, category: c.id }); setSubstep('brand') }}
-                    selected={draft.category === c.id}
+                    onClick={() => {
+                      setDraft({ ...EMPTY, category: c.category, brand: c.brand })
+                      // Skip 'brand' step when tile already implies brand
+                      setSubstep(c.brand ? 'model' : 'brand')
+                    }}
+                    selected={false}
                   >
-                    <Icon className="h-8 w-8 mb-3" />
-                    <div className="text-base font-semibold">{c.label}</div>
+                    <div className="flex flex-col items-center text-center gap-3 py-2">
+                      <Icon className="h-9 w-9 text-gray-800" strokeWidth={1.4} />
+                      <div className="text-[15px] font-medium tracking-tight">{c.label}</div>
+                    </div>
                   </Tile>
                 )
               })}
@@ -480,10 +506,10 @@ function CarrierScreen({ selected, onPick }: {
 
 function Screen({ heading, subheading, children }: { heading: string; subheading?: string; children: React.ReactNode }) {
   return (
-    <div className="space-y-6">
-      <div className="space-y-1.5">
-        <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900">{heading}</h2>
-        {subheading && <p className="text-gray-500">{subheading}</p>}
+    <div className="space-y-7">
+      <div className="space-y-2">
+        <h2 className="text-3xl sm:text-4xl font-semibold tracking-tight text-gray-900 leading-tight">{heading}</h2>
+        {subheading && <p className="text-gray-500 text-base leading-snug">{subheading}</p>}
       </div>
       {children}
     </div>
@@ -491,7 +517,7 @@ function Screen({ heading, subheading, children }: { heading: string; subheading
 }
 
 function Grid({ cols, children }: { cols: 2 | 3; children: React.ReactNode }) {
-  return <div className={`grid gap-2.5 ${cols === 2 ? 'grid-cols-2' : 'grid-cols-2 sm:grid-cols-3'}`}>{children}</div>
+  return <div className={`grid gap-3 sm:gap-4 ${cols === 2 ? 'grid-cols-2' : 'grid-cols-2 sm:grid-cols-3'}`}>{children}</div>
 }
 
 function Tile({ children, onClick, selected, disabled, emphasis }: {
@@ -502,17 +528,17 @@ function Tile({ children, onClick, selected, disabled, emphasis }: {
       onClick={onClick}
       disabled={disabled}
       className={`
-        relative p-6 rounded-3xl border-2 text-left transition-all duration-200
-        ${disabled ? 'border-gray-100 bg-gray-50 text-gray-300 cursor-not-allowed' :
-          selected ? 'border-yellow-500 bg-yellow-50 text-gray-900 shadow-lg shadow-yellow-500/20 scale-[1.02]' :
-          emphasis === 'best' ? 'border-emerald-200 bg-emerald-50/60 hover:border-emerald-400 hover:shadow-md text-gray-900' :
-          'border-gray-200 bg-white hover:border-gray-900 hover:shadow-md text-gray-900'}
+        group relative p-6 sm:p-7 rounded-3xl border text-left transition-all duration-200 ease-out
+        ${disabled ? 'border-gray-100 bg-gray-50/60 text-gray-300 cursor-not-allowed' :
+          selected ? 'border-gray-900 bg-white text-gray-900 shadow-[0_4px_16px_-4px_rgba(0,0,0,0.12),0_0_0_1px_rgba(17,24,39,1)] -translate-y-0.5' :
+          emphasis === 'best' ? 'border-emerald-200/80 bg-white shadow-sm hover:border-emerald-300 hover:shadow-md hover:-translate-y-0.5 text-gray-900' :
+          'border-gray-200/80 bg-white shadow-sm hover:border-gray-300 hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.99] text-gray-900'}
       `}
     >
       {children}
       {selected && (
-        <div className="absolute top-3 right-3 h-6 w-6 rounded-full bg-yellow-500 flex items-center justify-center shadow">
-          <Check className="h-3.5 w-3.5 text-black" strokeWidth={3} />
+        <div className="absolute top-3.5 right-3.5 h-5 w-5 rounded-full bg-gray-900 flex items-center justify-center">
+          <Check className="h-3 w-3 text-white" strokeWidth={2.5} />
         </div>
       )}
     </button>
@@ -526,38 +552,39 @@ function ModelPickerAtlas({ models, selected, onPick }: { models: AtlasModel[]; 
   return (
     <Screen heading="Which iPhone?">
       <div className="relative">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+        <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" strokeWidth={2} />
         <input
           type="text"
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder="Search — e.g. 15 Pro"
-          className="w-full pl-11 pr-4 py-3.5 rounded-2xl border-2 border-gray-100 bg-gray-50 focus:bg-white text-gray-900 outline-none focus:border-gray-900 text-base transition-colors"
+          className="w-full pl-12 pr-5 py-4 rounded-full border border-gray-200/80 bg-gray-50/60 focus:bg-white text-gray-900 placeholder:text-gray-400 outline-none focus:border-gray-300 text-[15px] transition-colors"
         />
       </div>
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 max-h-[55vh] overflow-y-auto pr-1 -mr-1">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 max-h-[60vh] overflow-y-auto pr-1 -mr-1 pb-2">
         {filtered.map((m) => {
           const on = selected === m.name
           return (
             <button
               key={m.name}
               onClick={() => onPick(m.name)}
-              className={`relative p-4 rounded-2xl border-2 text-left transition-all duration-150 ${
-                on ? 'border-yellow-500 bg-yellow-50 shadow-md shadow-yellow-500/20' :
-                'border-gray-200 bg-white hover:border-gray-900 hover:shadow-sm'
+              className={`relative px-5 py-4 rounded-2xl border text-left transition-all duration-200 ease-out ${
+                on
+                  ? 'border-gray-900 bg-white shadow-[0_4px_16px_-4px_rgba(0,0,0,0.12),0_0_0_1px_rgba(17,24,39,1)] -translate-y-0.5'
+                  : 'border-gray-200/80 bg-white shadow-sm hover:border-gray-300 hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.99]'
               }`}
             >
-              <div className="text-[14px] font-bold text-gray-900 leading-snug">{m.name}</div>
+              <div className="text-[15px] font-medium text-gray-900 leading-snug tracking-tight">{m.name}</div>
               {on && (
-                <div className="absolute top-2 right-2 h-5 w-5 rounded-full bg-yellow-500 flex items-center justify-center shadow">
-                  <Check className="h-3 w-3 text-black" strokeWidth={3} />
+                <div className="absolute top-2.5 right-2.5 h-5 w-5 rounded-full bg-gray-900 flex items-center justify-center">
+                  <Check className="h-3 w-3 text-white" strokeWidth={2.5} />
                 </div>
               )}
             </button>
           )
         })}
         {filtered.length === 0 && (
-          <p className="col-span-full text-sm text-gray-400 italic p-6 text-center">No matches — try a different search.</p>
+          <p className="col-span-full text-[14px] text-gray-400 p-8 text-center">No matches — try a different search.</p>
         )}
       </div>
     </Screen>
@@ -720,19 +747,21 @@ function ModelPickerFreeText({ value, placeholder, onChange, onNext }: {
 
 function StoragePicker({ selected, options, onPick }: { selected: string; options: string[]; onPick: (s: string) => void }) {
   return (
-    <div className="grid grid-cols-3 gap-2.5">
+    <div className="grid grid-cols-3 gap-3">
       {options.map((s) => (
         <button
           key={s}
           onClick={() => onPick(s)}
-          className={`relative py-5 rounded-2xl border-2 font-bold transition-all text-xl ${
-            selected === s ? 'border-yellow-500 bg-yellow-50 text-gray-900 shadow-md shadow-yellow-500/20' : 'border-gray-200 bg-white hover:border-gray-900 text-gray-900'
+          className={`relative py-5 rounded-2xl border font-medium transition-[transform,box-shadow,border-color] duration-200 ease-out text-lg tracking-tight tabular-nums ${
+            selected === s
+              ? 'border-gray-900 bg-white text-gray-900 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_0_0_1px_rgba(17,24,39,1)]'
+              : 'border-gray-200/80 bg-white hover:border-gray-300 hover:shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:-translate-y-px text-gray-900'
           }`}
         >
           {s}
           {selected === s && (
-            <div className="absolute top-2 right-2 h-5 w-5 rounded-full bg-yellow-500 flex items-center justify-center">
-              <Check className="h-3 w-3 text-black" strokeWidth={3} />
+            <div className="absolute top-2 right-2 h-5 w-5 rounded-full bg-gray-900 flex items-center justify-center">
+              <Check className="h-3 w-3 text-white" strokeWidth={2.5} />
             </div>
           )}
         </button>
@@ -747,18 +776,20 @@ function ConditionRow({ condition, selected, onClick }: {
   return (
     <button
       onClick={onClick}
-      className={`w-full flex items-center gap-4 p-5 rounded-2xl border-2 text-left transition-all duration-150 ${
-        selected ? 'border-yellow-500 bg-yellow-50 shadow-lg shadow-yellow-500/20' : 'border-gray-200 bg-white hover:border-gray-900 hover:shadow-sm'
+      className={`w-full flex items-center gap-4 p-5 rounded-2xl border text-left transition-[transform,box-shadow,border-color] duration-200 ease-out ${
+        selected
+          ? 'border-gray-900 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.04),0_0_0_1px_rgba(17,24,39,1)]'
+          : 'border-gray-200/80 bg-white hover:border-gray-300 hover:shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:-translate-y-px'
       }`}
     >
       <div className="flex-1">
-        <div className="font-bold text-[16px] text-gray-900">{condition.title}</div>
-        <div className="text-sm mt-1 text-gray-500 leading-relaxed">{condition.description}</div>
+        <div className="font-medium text-[16px] text-gray-900 tracking-tight">{condition.title}</div>
+        <div className="text-[13px] mt-1 text-gray-500 leading-relaxed">{condition.description}</div>
       </div>
       <div className={`h-6 w-6 rounded-full flex items-center justify-center flex-shrink-0 transition-all ${
-        selected ? 'bg-yellow-500 scale-100' : 'bg-gray-100 scale-90'
+        selected ? 'bg-gray-900' : 'bg-gray-100'
       }`}>
-        {selected && <Check className="h-3.5 w-3.5 text-black" strokeWidth={3} />}
+        {selected && <Check className="h-3 w-3 text-white" strokeWidth={2.5} />}
       </div>
     </button>
   )
@@ -770,8 +801,8 @@ function OfferScreen({ loading, offer, smartSource, onAccept }: {
   if (loading) {
     return (
       <div className="text-center py-20">
-        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-gray-900 mx-auto mb-4" />
-        <p className="text-gray-500">Pulling live market prices…</p>
+        <div className="animate-spin rounded-full h-7 w-7 border-2 border-gray-200 border-t-gray-900 mx-auto mb-4" />
+        <p className="text-gray-500 text-[14px]">Pulling live market prices…</p>
       </div>
     )
   }
@@ -783,12 +814,12 @@ function OfferScreen({ loading, offer, smartSource, onAccept }: {
   if (rejected) {
     return (
       <Screen heading="We need to see it in person">
-        <div className="bg-orange-50 border border-orange-200 rounded-2xl p-5">
-          <AlertTriangle className="h-6 w-6 text-orange-500 mb-3" />
-          <p className="text-sm text-gray-700 mb-4">Drop your info below — we&apos;ll give you a real number once we take a look.</p>
+        <div className="bg-orange-50/80 border border-orange-200/80 rounded-2xl p-5">
+          <AlertTriangle className="h-5 w-5 text-orange-500 mb-3" strokeWidth={2} />
+          <p className="text-[14px] text-gray-700 mb-2 leading-relaxed">Drop your info below — we&apos;ll give you a real number once we take a look.</p>
         </div>
-        <button onClick={onAccept} className="w-full bg-gray-900 hover:bg-black text-white font-semibold py-4 rounded-2xl transition-colors inline-flex items-center justify-center gap-2 text-base">
-          Continue <ArrowRight className="h-4 w-4" />
+        <button onClick={onAccept} className="w-full bg-gray-900 hover:bg-black active:scale-[0.99] text-white font-medium py-3.5 rounded-full transition-[transform,background-color] duration-150 inline-flex items-center justify-center gap-2 text-[15px] tracking-tight">
+          Continue <ArrowRight className="h-3.5 w-3.5" strokeWidth={2.25} />
         </button>
       </Screen>
     )
@@ -797,11 +828,11 @@ function OfferScreen({ loading, offer, smartSource, onAccept }: {
   if (finalCents === 0) {
     return (
       <Screen heading="Custom quote needed">
-        <div className="bg-gray-50 border border-gray-200 rounded-2xl p-5">
-          <p className="text-sm text-gray-700">We don&apos;t have a live price for this exact device — submit your info and a technician will send a custom offer within one business day.</p>
+        <div className="bg-gray-50/80 border border-gray-200/80 rounded-2xl p-5">
+          <p className="text-[14px] text-gray-700 leading-relaxed">We don&apos;t have a live price for this exact device — submit your info and a technician will send a custom offer within one business day.</p>
         </div>
-        <button onClick={onAccept} className="w-full bg-gray-900 hover:bg-black text-white font-semibold py-4 rounded-2xl transition-colors inline-flex items-center justify-center gap-2 text-base">
-          Continue <ArrowRight className="h-4 w-4" />
+        <button onClick={onAccept} className="w-full bg-gray-900 hover:bg-black active:scale-[0.99] text-white font-medium py-3.5 rounded-full transition-[transform,background-color] duration-150 inline-flex items-center justify-center gap-2 text-[15px] tracking-tight">
+          Continue <ArrowRight className="h-3.5 w-3.5" strokeWidth={2.25} />
         </button>
       </Screen>
     )
@@ -811,20 +842,20 @@ function OfferScreen({ loading, offer, smartSource, onAccept }: {
     <div className="space-y-6">
       {smartSource && smartSource !== 'none' && (
         <div className="flex justify-center">
-          <div className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full">
-            <Zap className="h-3 w-3" /> Live market price
+          <div className="inline-flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-[0.08em] text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full">
+            <Zap className="h-3 w-3" strokeWidth={2.25} /> Live market price
           </div>
         </div>
       )}
       <div className="text-center py-6">
-        <div className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">Your offer</div>
-        <div className="text-7xl font-bold text-gray-900 tracking-tight">{formatCents(finalCents)}</div>
-        <div className="text-gray-500 mt-2 text-sm">
-          in cash, or <span className="font-semibold text-gray-900">{formatCents(creditCents)} store credit</span>
+        <div className="text-[11px] font-medium text-gray-500 uppercase tracking-[0.08em] mb-3">Your offer</div>
+        <div className="text-[72px] sm:text-[80px] font-semibold text-gray-900 tracking-[-0.04em] leading-none">{formatCents(finalCents)}</div>
+        <div className="text-gray-500 mt-3 text-[14px]">
+          in cash, or <span className="font-medium text-gray-900">{formatCents(creditCents)} store credit</span>
         </div>
       </div>
-      <button onClick={onAccept} className="w-full bg-gray-900 hover:bg-black text-white font-semibold py-4 rounded-2xl transition-colors inline-flex items-center justify-center gap-2 text-base">
-        Lock in my offer <ArrowRight className="h-4 w-4" />
+      <button onClick={onAccept} className="w-full bg-gray-900 hover:bg-black active:scale-[0.99] text-white font-medium py-3.5 rounded-full transition-[transform,background-color] duration-150 inline-flex items-center justify-center gap-2 text-[15px] tracking-tight">
+        Lock in my offer <ArrowRight className="h-3.5 w-3.5" strokeWidth={2.25} />
       </button>
     </div>
   )
@@ -842,14 +873,14 @@ function ContactForm({ draft, setDraft, submitting, onSubmit }: {
         onChange={(e) => setDraft({ ...draft, name: e.target.value })}
         placeholder="Your name"
         autoFocus
-        className="w-full px-5 py-4 rounded-2xl border border-gray-200 text-gray-900 text-lg outline-none focus:border-gray-900"
+        className="w-full px-4 py-3 rounded-2xl border border-gray-200/80 text-gray-900 text-[15px] placeholder:text-gray-400 outline-none focus:border-gray-300 transition-colors"
       />
       <input
         type="text"
         value={draft.contact}
         onChange={(e) => setDraft({ ...draft, contact: e.target.value })}
         placeholder="Phone or email"
-        className="w-full px-5 py-4 rounded-2xl border border-gray-200 text-gray-900 text-lg outline-none focus:border-gray-900"
+        className="w-full px-4 py-3 rounded-2xl border border-gray-200/80 text-gray-900 text-[15px] placeholder:text-gray-400 outline-none focus:border-gray-300 transition-colors"
       />
       <input
         type="text" value={draft.honeypot} onChange={(e) => setDraft({ ...draft, honeypot: e.target.value })}
@@ -858,11 +889,15 @@ function ContactForm({ draft, setDraft, submitting, onSubmit }: {
       <button
         onClick={onSubmit}
         disabled={!ready || submitting}
-        className="w-full bg-gray-900 hover:bg-black disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white font-semibold py-4 rounded-2xl transition-colors inline-flex items-center justify-center gap-2 text-base"
+        className="w-full bg-gray-900 hover:bg-black active:scale-[0.99] disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed text-white font-medium py-3.5 rounded-full transition-[transform,background-color] duration-150 inline-flex items-center justify-center gap-2 text-[15px] tracking-tight"
       >
-        {submitting ? 'Submitting…' : 'Submit'} {!submitting && <ArrowRight className="h-4 w-4" />}
+        {submitting ? (
+          <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Submitting…</>
+        ) : (
+          <>Submit <ArrowRight className="h-3.5 w-3.5" strokeWidth={2.25} /></>
+        )}
       </button>
-      <p className="text-xs text-gray-400 text-center pt-2">
+      <p className="text-[12px] text-gray-400 text-center pt-2">
         Bring a photo ID when you come in — required by Oregon law.
       </p>
     </div>

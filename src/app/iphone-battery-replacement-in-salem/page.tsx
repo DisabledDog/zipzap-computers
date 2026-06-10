@@ -24,6 +24,7 @@ export default function iPhoneBatteryReplacementSalem() {
 }
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/iphone-battery-replacement-in-salem' },
   title: 'iPhone Battery Replacement in Salem, Oregon | ZipZap Computers',
   description: 'Professional iPhone battery replacement service in Salem, Oregon. Fix poor battery life, unexpected shutdowns, and swollen batteries. Genuine quality batteries with lifetime warranty.',
   keywords: 'iPhone battery replacement Salem Oregon, iPhone battery repair Salem, iPhone battery life Salem, iPhone swollen battery Salem, iPhone battery service Salem',

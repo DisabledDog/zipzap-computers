@@ -14,6 +14,7 @@ export default function LaptopRepairSalem() {
 }
 
 export const metadata = {
+  alternates: { canonical: '/laptop-repair-services-in-salem' },
   title: 'Laptop Repair Services in Salem, Oregon | ZipZap Computers',
   description: 'Comprehensive laptop repair in Salem, Oregon. Dell, HP, Lenovo, ASUS laptop screen replacement, keyboard repair, SSD upgrades, motherboard diagnostics.',
   keywords: 'laptop repair Salem Oregon, laptop screen replacement Salem, laptop keyboard repair Salem, laptop SSD upgrade Salem, laptop motherboard repair Salem',

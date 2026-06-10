@@ -24,6 +24,7 @@ export default function PlayStationRepairSalem() {
 }
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/playstation-repair-in-salem' },
   title: 'PlayStation Repair in Salem, Oregon | ZipZap Computers',
   description: 'Professional PlayStation repair service in Salem, Oregon. Expert repair for PS5, PS4, PS4 Pro consoles. Fix overheating, disc drive issues, HDMI problems with service warranty.',
   keywords: 'PlayStation repair Salem Oregon, PS5 repair Salem, PS4 repair Salem, PlayStation console repair Salem, gaming console repair Salem, PlayStation overheating Salem',

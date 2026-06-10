@@ -14,6 +14,7 @@ export default function GamingConsoleRepairSalem() {
 }
 
 export const metadata = {
+  alternates: { canonical: '/gaming-console-repair-services-in-salem' },
   title: 'Gaming Console Repair Services in Salem, Oregon | ZipZap Computers',
   description: 'Professional gaming console repair in Salem, Oregon. PlayStation 5, PS4, Xbox Series X/S, Nintendo Switch repair. Controller repair and hardware diagnostics.',
   keywords: 'gaming console repair Salem Oregon, PlayStation repair Salem, Xbox repair Salem, Nintendo Switch repair Salem, controller repair Salem',

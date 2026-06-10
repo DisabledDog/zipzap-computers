@@ -14,6 +14,7 @@ export default function ComputerRepairSalem() {
 }
 
 export const metadata = {
+  alternates: { canonical: '/computer-repair-services-in-salem' },
   title: 'Computer Repair Services in Salem, Oregon | ZipZap Computers',
   description: 'Complete computer repair services in Salem, Oregon. Desktop PC repair, virus removal, hardware upgrades, custom PC builds, and data recovery.',
   keywords: 'computer repair Salem Oregon, desktop PC repair Salem, virus removal Salem, hardware upgrades Salem, custom PC builds Salem, data recovery Salem',
