@@ -8,10 +8,54 @@
   box-sizing: border-box;
 }
 
+html, body {
+  overflow-x: clip;
+}
+
 body {
   background: #FFFFFF;
   color: #0A0A0A;
   font-family: 'Inter', sans-serif;
   line-height: 1.6;
   font-display: swap;
+}
+
+/* ---- Motion system: scroll reveals + hero entrance ----
+   Elements start hidden/offset and animate in when revealed.
+   All motion collapses to an instant state under reduced-motion. */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: opacity, transform;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Hero entrance — fires once on load, staggered via inline delay */
+@keyframes zz-rise {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.zz-enter {
+  opacity: 0;
+  animation: zz-rise 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: var(--enter-delay, 0ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .zz-enter {
+    opacity: 1;
+    animation: none;
+  }
 }

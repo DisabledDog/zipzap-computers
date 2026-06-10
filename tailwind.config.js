@@ -27,6 +27,7 @@ module.exports = {
       fontFamily: {
         sans: ['Inter', 'sans-serif'],
         heading: ['Plus Jakarta Sans', 'sans-serif'],
+        display: ['Space Grotesk', 'sans-serif'],
       },
       boxShadow: {
         card: '0 6px 20px rgba(0,0,0,.08)',

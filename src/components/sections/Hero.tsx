@@ -1,148 +1,181 @@
 'use client'
 
-import Link from 'next/link'
 import Image from 'next/image'
-import { Phone, ArrowRight, DollarSign } from 'lucide-react'
-import InteractiveLightning from '@/components/ui/InteractiveLightning'
+import { useEffect, useState } from 'react'
+import { Phone, ArrowRight, Wrench, DollarSign, MapPin, Star, ShieldCheck, Clock } from 'lucide-react'
+import HeaderElectric from '@/components/ui/HeaderElectric'
 
 export default function Hero() {
+  // Live Google rating — same source the reviews widget uses, so the hero
+  // can never claim a number the reviews section doesn't back up.
+  const [rating, setRating] = useState<number | null>(null)
+  const [reviewCount, setReviewCount] = useState<number | null>(null)
+
+  useEffect(() => {
+    fetch('/api/google-reviews')
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.rating) setRating(data.rating)
+        if (data?.user_ratings_total) setReviewCount(data.user_ratings_total)
+      })
+      .catch(() => {/* render falls back gracefully */})
+  }, [])
+
   return (
-    <section className="py-12 lg:py-16 bg-black relative overflow-hidden">
-      {/* Interactive Lightning Background */}
-      <InteractiveLightning />
+    <section className="relative overflow-hidden bg-zz-black py-12 lg:py-20">
+      {/* Brand lightning — the same electric motif as the store */}
+      <HeaderElectric tall sparkDensity={38} boltJitter={14} boltInterval={[1000, 2600]} intensity={0.7} />
+      {/* Warm amber glow — replaces the old hex-grid noise with something inviting */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -top-40 -left-40 h-[32rem] w-[32rem] rounded-full bg-yellow-500/20 blur-[120px]"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -bottom-48 -right-32 h-[28rem] w-[28rem] rounded-full bg-yellow-400/10 blur-[120px]"
+      />
 
-      {/* Hexagonal Honeycomb Background */}
-      <div className="absolute inset-0 opacity-30">
-        <svg className="w-full h-full" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <pattern id="hero-hexagon-pattern" x="0" y="0" width="20" height="17.32" patternUnits="userSpaceOnUse">
-              {/* Main hexagon */}
-              <polygon
-                points="10,2 17.32,6 17.32,14 10,18 2.68,14 2.68,6"
-                fill="none"
-                stroke="#fbbf24"
-                strokeWidth="0.8"
-                opacity="0.8"
-              />
-              {/* Offset hexagon for honeycomb tessellation */}
-              <polygon
-                points="30,10.66 37.32,14.66 37.32,22.66 30,26.66 22.68,22.66 22.68,14.66"
-                fill="none"
-                stroke="#fbbf24"
-                strokeWidth="0.8"
-                opacity="0.6"
-              />
-              {/* Additional hexagons for better coverage */}
-              <polygon
-                points="-10,10.66 -2.68,14.66 -2.68,22.66 -10,26.66 -17.32,22.66 -17.32,14.66"
-                fill="none"
-                stroke="#fbbf24"
-                strokeWidth="0.8"
-                opacity="0.6"
-              />
-              {/* Center dots */}
-              <circle cx="10" cy="10" r="0.8" fill="#fbbf24" opacity="0.4" />
-              <circle cx="30" cy="18.66" r="0.6" fill="#fbbf24" opacity="0.3" />
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#hero-hexagon-pattern)" />
-        </svg>
-      </div>
-
-      {/* Blade/Diagonal accent elements */}
-      <div className="absolute top-10 -right-20 w-40 h-2 bg-yellow-500 opacity-40 transform rotate-45"></div>
-      <div className="absolute bottom-20 -left-20 w-32 h-1 bg-yellow-500 opacity-30 transform -rotate-45"></div>
-      <div className="absolute top-1/3 -left-10 w-24 h-1 bg-gray-400 opacity-20 transform rotate-12"></div>
-      <div className="absolute bottom-1/3 -right-15 w-28 h-1 bg-yellow-400 opacity-25 transform -rotate-12"></div>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-          {/* Left column - Content */}
-          <div className="space-y-6 lg:space-y-8 text-center lg:text-left">
-            <div className="space-y-4">
-              <h1 className="text-3xl sm:text-4xl lg:text-6xl font-heading font-bold text-white leading-tight">
-                Fast, reliable electronics repair{' '}
-                <span className="text-yellow-500">in Salem</span>
-              </h1>
-              <p className="text-lg sm:text-xl text-gray-300 leading-relaxed max-w-xl mx-auto lg:mx-0">
-                Phones, computers, and consoles. Lifetime repair warranty. Same-day service
-                on most fixes.
-              </p>
+      <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14">
+          {/* Left column — content + the two paths */}
+          <div className="text-center lg:text-left">
+            {/* Eyebrow */}
+            <div
+              className="zz-enter inline-flex items-center gap-2 rounded-full border border-yellow-500/30 bg-yellow-500/10 px-4 py-1.5 text-sm font-medium text-yellow-300"
+              style={{ ['--enter-delay' as string]: '0ms' }}
+            >
+              <MapPin className="h-4 w-4" />
+              Salem, Oregon · Locally owned since 2021
             </div>
 
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start">
+            {/* Headline */}
+            <h1
+              className="zz-enter mt-5 font-heading text-4xl font-bold leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-6xl"
+              style={{ ['--enter-delay' as string]: '80ms' }}
+            >
+              Let&apos;s get your tech{' '}
+              <span className="text-yellow-500">sorted.</span>
+            </h1>
+
+            <p
+              className="zz-enter mx-auto mt-5 max-w-xl text-lg leading-relaxed text-gray-300 lg:mx-0"
+              style={{ ['--enter-delay' as string]: '160ms' }}
+            >
+              Got a broken device, or one you&apos;re ready to part with? Pick a path below
+              and we&apos;ll take it from here — friendly help, fair prices, no pressure.
+            </p>
+
+            {/* The two paths — the heart of the page */}
+            <div
+              className="zz-enter mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2"
+              style={{ ['--enter-delay' as string]: '240ms' }}
+            >
+              {/* Fix */}
               <a
-                href="#quote-form"
-                className="bg-yellow-500 hover:bg-yellow-400 text-black px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold text-base sm:text-lg transition-all transform hover:scale-105 inline-flex items-center justify-center gap-2 shadow-lg"
+                href="#fix"
+                className="group relative flex flex-col rounded-2xl border border-gray-700 bg-white/[0.04] p-5 text-left transition-all duration-300 hover:-translate-y-1 hover:border-yellow-500 hover:bg-white/[0.07] hover:shadow-2xl hover:shadow-yellow-500/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-yellow-400"
               >
-                Repair Quote
-                <ArrowRight className="h-4 w-4 sm:h-5 sm:w-5" />
+                <span className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-yellow-500 text-black transition-transform duration-300 group-hover:scale-110">
+                  <Wrench className="h-6 w-6" />
+                </span>
+                <span className="font-heading text-xl font-bold text-white">Fix my device</span>
+                <span className="mt-1 text-sm text-gray-400">Free repair quote in 2 minutes</span>
+                <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-yellow-400">
+                  Get my quote
+                  <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+                </span>
               </a>
-              <Link
-                href="/sell"
-                className="bg-black hover:bg-gray-900 text-yellow-400 px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold text-base sm:text-lg transition-all transform hover:scale-105 inline-flex items-center justify-center gap-2 shadow-lg border-2 border-yellow-500"
+
+              {/* Sell */}
+              <a
+                href="#sell"
+                className="group relative flex flex-col rounded-2xl border border-gray-700 bg-white/[0.04] p-5 text-left transition-all duration-300 hover:-translate-y-1 hover:border-yellow-500 hover:bg-white/[0.07] hover:shadow-2xl hover:shadow-yellow-500/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-yellow-400"
               >
-                <DollarSign className="h-4 w-4 sm:h-5 sm:w-5" />
-                Sell Your Device
-              </Link>
+                <span className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-yellow-500 text-black transition-transform duration-300 group-hover:scale-110">
+                  <DollarSign className="h-6 w-6" />
+                </span>
+                <span className="font-heading text-xl font-bold text-white">Sell my device</span>
+                <span className="mt-1 text-sm text-gray-400">Get a cash offer today</span>
+                <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-yellow-400">
+                  See my offer
+                  <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+                </span>
+              </a>
+            </div>
+
+            {/* Rating + call */}
+            <div
+              className="zz-enter mt-7 flex flex-col items-center gap-4 sm:flex-row sm:gap-6 lg:items-start"
+              style={{ ['--enter-delay' as string]: '320ms' }}
+            >
+              <div className="flex items-center gap-2">
+                <div className="flex">
+                  {[1, 2, 3, 4, 5].map((s) => (
+                    <Star
+                      key={s}
+                      className={`h-5 w-5 ${
+                        rating && s <= Math.round(rating)
+                          ? 'fill-yellow-400 text-yellow-400'
+                          : 'fill-gray-600 text-gray-600'
+                      }`}
+                    />
+                  ))}
+                </div>
+                <span className="text-sm text-gray-300">
+                  <span className="font-bold text-white">{rating ? rating.toFixed(1) : '4.9'}</span>
+                  {reviewCount ? ` · ${reviewCount}+ Google reviews` : ' on Google'}
+                </span>
+              </div>
+
               <a
                 href="tel:5034009920"
-                className="bg-yellow-500 hover:bg-yellow-400 text-black px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold text-base sm:text-lg transition-all transform hover:scale-105 inline-flex items-center justify-center gap-2 shadow-lg border-2 border-yellow-600"
+                className="inline-flex items-center gap-2 font-semibold text-yellow-400 transition-colors hover:text-yellow-300"
               >
-                <Phone className="h-4 w-4 sm:h-5 sm:w-5" />
-                Call
+                <Phone className="h-4 w-4" />
+                (503) 400-9920
               </a>
             </div>
 
-            {/* Trust badges */}
-            <div className="flex flex-wrap gap-2 sm:gap-4 pt-4 justify-center lg:justify-start">
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg px-3 sm:px-4 py-2 flex items-center gap-2">
-                <div className="w-2 h-2 sm:w-3 sm:h-3 bg-yellow-500 rounded-full"></div>
-                <span className="text-gray-700 font-medium text-sm sm:text-base">Lifetime Warranty</span>
-              </div>
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg px-3 sm:px-4 py-2 flex items-center gap-2">
-                <div className="w-2 h-2 sm:w-3 sm:h-3 bg-yellow-500 rounded-full"></div>
-                <span className="text-gray-700 font-medium text-sm sm:text-base">Same-Day Service</span>
-              </div>
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg px-3 sm:px-4 py-2 flex items-center gap-2">
-                <div className="w-2 h-2 sm:w-3 sm:h-3 bg-yellow-500 rounded-full"></div>
-                <span className="text-gray-700 font-medium text-sm sm:text-base">Local & Independent</span>
-              </div>
+            {/* Slim trust row */}
+            <div
+              className="zz-enter mt-6 flex flex-wrap justify-center gap-x-5 gap-y-2 text-sm text-gray-400 lg:justify-start"
+              style={{ ['--enter-delay' as string]: '400ms' }}
+            >
+              <span className="inline-flex items-center gap-1.5">
+                <ShieldCheck className="h-4 w-4 text-yellow-500" /> Lifetime warranty
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <Clock className="h-4 w-4 text-yellow-500" /> Same-day on most repairs
+              </span>
             </div>
           </div>
 
-          {/* Right column - Store Photo */}
-          <div className="relative">
-            {/* Store Photo */}
-            <div className="relative rounded-2xl overflow-hidden shadow-2xl">
+          {/* Right column — store photo with a friendly floating badge */}
+          <div
+            className="zz-enter relative"
+            style={{ ['--enter-delay' as string]: '200ms' }}
+          >
+            <div className="relative overflow-hidden rounded-3xl shadow-2xl ring-1 ring-white/10">
               <Image
                 src="/store-interior.jpg"
-                alt="ZipZap Computers Store Interior - Professional electronics repair shop in Salem, Oregon"
+                alt="ZipZap Computers store interior — professional electronics repair shop in Salem, Oregon"
                 width={800}
                 height={600}
-                priority={true}
-                className="w-full h-full object-cover aspect-[4/3]"
+                priority
+                className="aspect-[4/3] h-full w-full object-cover"
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 40vw"
               />
-
-              {/* Overlay for better text contrast */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
-
+              <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
             </div>
 
-            {/* Floating stats */}
-            <div className="absolute -bottom-4 -left-4 bg-white p-4 rounded-xl shadow-card border border-gray-200">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-black">Walk-In</div>
-                <div className="text-sm text-gray-600">No Appointment</div>
-              </div>
-            </div>
-
-            <div className="absolute -top-4 -right-4 bg-white p-4 rounded-xl shadow-card border border-gray-200">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-black">Same Day</div>
-                <div className="text-sm text-gray-600">Service Available</div>
+            {/* Floating "come on in" badge */}
+            <div className="absolute -bottom-4 left-4 flex items-center gap-3 rounded-2xl border border-gray-100 bg-white px-4 py-3 shadow-xl sm:left-6">
+              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-yellow-500">
+                <MapPin className="h-5 w-5 text-black" />
+              </span>
+              <div className="text-left leading-tight">
+                <div className="text-sm font-bold text-black">Come say hi</div>
+                <div className="text-xs text-gray-500">3945 Rich Dr NE B, Salem</div>
               </div>
             </div>
           </div>

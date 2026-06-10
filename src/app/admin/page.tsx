@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Shield, Trash2, Edit, Plus, LogOut, Package, Upload, DollarSign, Tag, Image as ImageIcon } from 'lucide-react'
 import { InventoryItem, defaultInventory, inventoryCategories } from '@/data/inventory'
+import { supabase } from '@/lib/supabase'
 
 export default function AdminPanel() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
@@ -139,6 +140,71 @@ export default function AdminPanel() {
   const saveInventory = (newInventory: InventoryItem[]) => {
     localStorage.setItem('zipzap_inventory', JSON.stringify(newInventory))
     setInventory(newInventory)
+  }
+
+  // --- One-time repair: shrink oversized photos already in the database ---
+  // Full-size photos bloat the inventory API past Vercel's response limit and
+  // stop the store from loading. This re-compresses each stored photo in place
+  // (keeps the photo, just smaller). Reads straight from Supabase so it works
+  // even when the normal /api/inventory list is too big to load.
+  const [isFixingPhotos, setIsFixingPhotos] = useState(false)
+  const [fixPhotosMsg, setFixPhotosMsg] = useState('')
+
+  const recompressDataUrl = (dataUrl: string, maxWidth = 640, quality = 0.5): Promise<string> =>
+    new Promise((resolve, reject) => {
+      const img = new Image()
+      img.onload = () => {
+        const canvas = document.createElement('canvas')
+        const ctx = canvas.getContext('2d')
+        const ratio = Math.min(1, maxWidth / img.width) // never upscale
+        canvas.width = Math.round(img.width * ratio)
+        canvas.height = Math.round(img.height * ratio)
+        ctx?.drawImage(img, 0, 0, canvas.width, canvas.height)
+        resolve(canvas.toDataURL('image/jpeg', quality))
+      }
+      img.onerror = () => reject(new Error('Could not read image'))
+      img.src = dataUrl
+    })
+
+  const compressExistingPhotos = async () => {
+    if (!confirm('Shrink all oversized inventory photos already saved? This keeps each photo, just smaller. Safe to run.')) return
+    setIsFixingPhotos(true)
+    setFixPhotosMsg('Reading items directly from the database…')
+    try {
+      // Direct Supabase read — bypasses the API size limit that's breaking the store.
+      const { data, error } = await supabase.from('inventory').select('id, title, image_url')
+      if (error) throw error
+      const big = (data || []).filter(
+        (it: any) => typeof it.image_url === 'string' && it.image_url.startsWith('data:image') && it.image_url.length > 120000
+      )
+      if (big.length === 0) {
+        setFixPhotosMsg('All photos are already small — nothing to do. ✅')
+        setIsFixingPhotos(false)
+        return
+      }
+      let done = 0
+      for (const it of big) {
+        setFixPhotosMsg(`Compressing ${done + 1} of ${big.length}: ${it.title || 'item'}…`)
+        const before = it.image_url.length
+        const smaller = await recompressDataUrl(it.image_url, 640, 0.5)
+        // Only write if it actually got smaller
+        const payload = smaller.length < before ? smaller : it.image_url
+        const res = await fetch('/api/inventory', {
+          method: 'PUT',
+          headers: getAuthHeaders(),
+          body: JSON.stringify({ id: it.id, image_url: payload }),
+        })
+        const r = await res.json()
+        if (!r.success) throw new Error(r.error || 'update failed')
+        done++
+      }
+      setFixPhotosMsg(`Done — compressed ${done} photo(s). Your store should load again now. ✅`)
+      await loadInventory()
+    } catch (e: any) {
+      setFixPhotosMsg('Error: ' + (e?.message || String(e)))
+    } finally {
+      setIsFixingPhotos(false)
+    }
   }
 
   const handleAddInventoryItem = async (e: React.FormEvent) => {
@@ -415,7 +481,7 @@ export default function AdminPanel() {
       }
 
       try {
-        const compressedImage = await compressImage(file, 800, 0.7)
+        const compressedImage = await compressImage(file, 640, 0.5)
         setInventoryFormData(prev => ({
           ...prev,
           image: compressedImage
@@ -1000,6 +1066,26 @@ export default function AdminPanel() {
               </div>
             )}
 
+            {/* One-time repair tool — shrink oversized photos so the store loads again */}
+            <div className="mb-6 rounded-lg border border-yellow-300 bg-yellow-50 p-4">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <h4 className="font-semibold text-gray-900">Store not loading? Shrink existing photos</h4>
+                  <p className="text-sm text-gray-600">
+                    Re-compresses photos already saved (keeps them, just smaller). Run this once if a big upload broke the store.
+                  </p>
+                </div>
+                <button
+                  onClick={compressExistingPhotos}
+                  disabled={isFixingPhotos}
+                  className="shrink-0 rounded-lg bg-black px-5 py-2.5 font-semibold text-white transition-colors hover:bg-gray-800 disabled:opacity-60"
+                >
+                  {isFixingPhotos ? 'Working…' : 'Shrink existing photos'}
+                </button>
+              </div>
+              {fixPhotosMsg && <p className="mt-3 text-sm font-medium text-gray-800">{fixPhotosMsg}</p>}
+            </div>
+
             <div className="bg-white rounded-lg shadow">
               <div className="p-6">
                 <h3 className="text-lg font-semibold mb-4">Current Inventory ({inventory.length} items)</h3>
@@ -1015,18 +1101,16 @@ export default function AdminPanel() {
                               <input
                                 type="file"
                                 accept="image/*"
-                                onChange={(e) => {
+                                onChange={async (e) => {
                                   const file = e.target.files?.[0]
                                   if (file) {
-                                    const reader = new FileReader()
-                                    reader.onload = (event) => {
-                                      const newImage = event.target?.result as string
-                                      const updatedInventory = inventory.map(inv =>
-                                        inv.id === item.id ? {...inv, image: newImage} : inv
-                                      )
-                                      saveInventory(updatedInventory)
-                                    }
-                                    reader.readAsDataURL(file)
+                                    // Compress before saving — full-size phone photos
+                                    // bloat the DB row and break the inventory API.
+                                    const newImage = await compressImage(file, 640, 0.5)
+                                    const updatedInventory = inventory.map(inv =>
+                                      inv.id === item.id ? {...inv, image: newImage} : inv
+                                    )
+                                    saveInventory(updatedInventory)
                                   }
                                 }}
                                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"

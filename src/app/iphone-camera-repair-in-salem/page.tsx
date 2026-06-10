@@ -24,6 +24,7 @@ export default function iPhoneCameraRepairSalem() {
 }
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/iphone-camera-repair-in-salem' },
   title: 'iPhone Camera Repair in Salem, Oregon | ZipZap Computers',
   description: 'Professional iPhone camera repair service in Salem, Oregon. We fix blurry photos, black screens, camera app crashes, and lens damage for all iPhone models with lifetime warranty.',
   keywords: 'iPhone camera repair Salem Oregon, iPhone camera not working Salem, iPhone camera lens repair Salem, blurry iPhone camera Salem, iPhone camera replacement Salem',

@@ -24,6 +24,7 @@ export default function iPhoneWaterDamageRepairSalem() {
 }
 
 export const metadata: Metadata = {
+  alternates: { canonical: '/iphone-water-damage-repair-in-salem' },
   title: 'iPhone Water Damage Repair in Salem, Oregon | ZipZap Computers',
   description: 'Emergency iPhone water damage repair service in Salem, Oregon. Professional ultrasonic cleaning and component-level repair with high success rates for liquid-damaged devices.',
   keywords: 'iPhone water damage repair Salem Oregon, iPhone liquid damage Salem, iPhone dropped in water Salem, iPhone water repair Salem, wet iPhone repair Salem',

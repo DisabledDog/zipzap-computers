@@ -1,4 +1,11 @@
+import type { Metadata } from 'next'
 import { Smartphone, Laptop, Gamepad2, Tablet, Watch, Headphones, Monitor, HardDrive, Wifi, Shield, Zap, Wrench } from 'lucide-react'
+
+export const metadata: Metadata = {
+  title: 'All Repair Services in Salem, OR | ZipZap Computers',
+  description: 'Complete repair services for iPhones, Samsung phones, iPads, MacBooks, laptops, PlayStation, Xbox, and more in Salem, Oregon. Lifetime warranty.',
+  alternates: { canonical: '/services' },
+}
 
 const services = [
   {

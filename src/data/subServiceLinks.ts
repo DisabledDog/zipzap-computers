@@ -76,12 +76,30 @@ export const subServiceLinks = {
   ]
 }
 
+// Sub-service slugs that have an actual page on disk (src/app/<slug>-in-salem/page.tsx).
+// This list filters subServiceLinks above to only links that resolve — without it,
+// every Salem service page would render 5–6 broken "Individual Options" links.
+// Add a slug here only after the corresponding page exists.
+const EXISTING_SLUGS_SALEM = new Set<string>([
+  'iphone-screen-replacement',
+  'iphone-battery-replacement',
+  'iphone-water-damage-repair',
+  'iphone-camera-repair',
+  'macbook-screen-replacement',
+  'macbook-battery-replacement',
+  'ipad-screen-replacement',
+  'playstation-repair',
+])
+
 export function getSubServiceLinks(serviceTitle: string, location: string) {
   const services = subServiceLinks[serviceTitle as keyof typeof subServiceLinks] || []
   const locationSuffix = location === 'salem' ? '-in-salem' : `-${location}`
+  const allowed = location === 'salem' ? EXISTING_SLUGS_SALEM : new Set<string>()
 
-  return services.map(service => ({
-    ...service,
-    url: `/${service.slug}${locationSuffix}`
-  }))
+  return services
+    .filter(service => allowed.has(service.slug))
+    .map(service => ({
+      ...service,
+      url: `/${service.slug}${locationSuffix}`
+    }))
 }

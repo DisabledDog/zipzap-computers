@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Don't index admin or API routes
+Disallow: /admin
+Disallow: /api/
+
+Sitemap: https://zipzapcomputers.com/sitemap.xml

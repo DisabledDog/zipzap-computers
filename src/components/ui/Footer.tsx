@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import { Zap, Phone, MapPin, Mail, Clock } from 'lucide-react'
+import Image from 'next/image'
+import { Phone, MapPin, Mail, Clock } from 'lucide-react'
 
 export default function Footer() {
   return (
@@ -8,8 +9,14 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Brand & Description */}
           <div className="space-y-4">
-            <Link href="/" className="flex items-center gap-2">
-              <Zap className="h-8 w-8 text-yellow-500" />
+            <Link href="/" className="flex items-center gap-2.5">
+              <Image
+                src="/zipzap-logo.png"
+                alt="ZipZap Computers logo"
+                width={48}
+                height={55}
+                className="h-12 w-auto"
+              />
               <span className="text-xl font-heading font-bold">
                 ZipZap Computers
               </span>
@@ -84,8 +91,7 @@ export default function Footer() {
                 <Clock className="h-5 w-5 text-yellow-500" />
                 <div className="text-gray-300">
                   <div>Mon-Fri: 10:00 AM - 6:00 PM</div>
-                  <div>Sat: 12:00 PM - 6:00 PM</div>
-                  <div>Sun: Closed</div>
+                  <div>Sat - Sun: Closed</div>
                 </div>
               </div>
             </div>
